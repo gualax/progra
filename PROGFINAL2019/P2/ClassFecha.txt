@@ -1,0 +1,145 @@
+
+///// FECHA.h /////////////////////////////////////////////////////////////////////////////
+#include <iostream>
+
+using namespace std;
+bool esBisiesto(int );
+
+class Fecha{
+
+private:
+   int dia;
+   int mes;
+   int anio;
+
+
+
+public:
+//Constructor
+  Fecha(int = 0, int=0, int=0);
+
+Fecha operator+(const Fecha &)const; // f1 + f3
+
+//static
+static bool esFechaValida(Fecha &);
+
+//friends
+friend ostream & operator<<(ostream &,Fecha &);
+friend istream & operator>>(istream &,Fecha &);
+
+
+};
+
+
+
+
+///// FECHA.C /////////////////////////////////////////////////////////////////////////////
+#include "claseFecha.h"
+
+//Constructor
+  Fecha::Fecha(int d, int m , int a){
+    dia = d;
+    mes = m;
+    anio = a;
+  }
+
+
+// cout<<f1
+ostream & operator<<(ostream &out,Fecha &obj){
+cout << obj.dia << "/" << obj.mes << "/"<< obj.anio;
+return out;
+}
+
+istream & operator>>(istream &input, Fecha &obj){
+
+int dia, mes, anio;
+bool fechaValida;
+do{
+    cout << "Ingrese el dia" << endl;
+    cin >> dia;
+    cout << "Ingrese el mes" << endl;
+    cin >> mes;
+    cout << "Ingrese el anio"<< endl;
+    cin >> anio;
+    obj.dia = dia;
+    obj.mes = mes;
+    obj.anio = anio;
+   fechaValida = obj.esFechaValida(obj);
+if(!fechaValida){
+    cout << "La fecha ingresada es incorrecta por favor intente denuevo" <<endl;
+}
+}while(!fechaValida);
+
+return input;
+
+}
+
+// f3 + f1
+Fecha Fecha::operator+(const Fecha &obj)const{
+Fecha aux;
+aux.dia = obj.dia + dia;
+if(aux.dia > 31){
+    aux.dia - 31;
+    aux.mes ++;
+}
+
+aux.mes = obj.mes + mes;
+
+if(aux.mes > 12){
+    aux.mes -12;
+    aux.anio ++;
+}
+
+aux.anio = obj.anio + anio;
+return aux;
+}
+
+
+bool Fecha::esFechaValida(Fecha &obj)
+{
+    int arrayDiasMes[12] = {31,29,31,30,31,30,31,31,30,31,30,31}; // la cantidad de dias que tiene cada mes
+    if(obj.anio==0) return false;
+    if(obj.dia<=0||obj.dia>31) return false;
+    if(obj.mes<=0||obj.mes>12) return false;
+    if(obj.mes == 2 && obj.dia>29) return false;
+    if(arrayDiasMes[obj.mes -1]<obj.dia) return false;
+    if(obj.mes==2 && obj.dia==29 && !esBisiesto(obj.anio)) return false;
+    return true;
+
+}
+
+
+bool esBisiesto(int a)
+{
+    if ((a%4==0)||(a%400==0)&&(a%100!=0)) return true;
+    else return false;
+}
+
+
+///// MAIN /////////////////////////////////////////////////////////////////////////////
+#include "claseFecha.h"
+
+
+int main()
+{
+    Fecha f1(10,3,1993);
+    Fecha f2;
+    Fecha f3;
+    Fecha f4;
+    cout << f1<< endl;
+
+  if(Fecha::esFechaValida(f1)){
+    cout << "La fecha "<< f1 << " es valida"<< endl;
+  }else{
+    cout << "La fecha "<<f1 << " NO ES VALIDA"<< endl;
+  }
+    cout << f2<< endl;
+    cin >>f2;
+    cout << f2<<endl;
+    f3 = f2;
+    cout << "F3 es: "<<f3<<endl;
+    f4 = f1 + f2;
+    cout << "F4 es: "<<f4<<endl;
+
+    return 0;
+}
