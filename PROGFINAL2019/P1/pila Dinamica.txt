@@ -1,0 +1,117 @@
+
+/*
+
+/// PILA DINAMICA ///////////////////////////////////
+
+
+typedef struct sNodoP
+{
+    tInfoD info;
+
+    struct sNodoP *sig;
+
+}tNodoP;
+
+typedef tNodoP *tPilaD;
+
+*/
+
+
+// Pila dinamica
+
+//  |   |
+//  |___|  en la pila siempre queda apuntando al tope y para llegar hasta abajo hay que ir desapilando
+
+
+
+void crearPila_D(tPilaD *p)
+{
+     *p == NULL;
+}
+
+int pilaVacia_D(tPilaD *p)
+{
+    return *p == NULL;
+
+}
+
+int pilaLlena_D(tPilaD *p)
+{
+    tNodoP *aux;
+
+    aux = (tNodoP *)malloc(sizeof(tNodoP));
+
+    if(aux == NULL) return 0;
+
+    free(aux);
+
+    return 1;
+
+}
+
+int apilar_D(tPilaD *p, tInfoD *d)
+{
+    tNodoP *nue;
+
+    nue =(tNodoP *)malloc(sizeof(tNodoP));
+
+    if(nue  ==  NULL) return 0;
+
+    nue->info = *d; // cargo en nue->info los datos
+    nue->sig = *p;  // hago que el sig apunte a la pila
+
+    *p = nue;       // cargo la pila con nue
+
+    return 1;
+
+
+}
+
+
+int desapilar_D(tPilaD *p, tInfoD *d)
+{
+
+    if(*p == NULL) return 0;        // me fijo si esta vacia
+
+    tNodo *aux;
+
+    aux = *p;  //cargo a aux con lo que hay en la pila
+
+    *p = aux->sig;
+
+    *d = aux->info; // paso de lo que hay en aux->info al contenedor de datos
+
+    free(aux);  //libero aux
+
+    return 1;
+
+}
+
+
+
+void verPrimeroEnPila_D(tPilaD *p, tInfoD *d)
+{
+
+    if(*p == NULL ) return 0;
+
+    *d = (*p)->info;
+
+    return 1;
+
+}
+
+void vaciarPila(tPilaD *p)
+{
+    tNodo *aux;
+
+    aux = (tNodo *)malloc(sizeof(tNodo));
+
+    while(*p)
+    {
+        aux = *p;
+
+        *p = aux->sig;
+
+        free(aux);   // libero la memoria de la pila
+    }
+}

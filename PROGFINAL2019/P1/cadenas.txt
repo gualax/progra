@@ -1,0 +1,529 @@
+/////////////////////////////////////////////////////////////////////////////////////
+/*
+   miStrcpy     copia el argunmento origen en el argumento destino
+*/
+
+char miStrcpy(char *dest, const char *ori)
+{
+
+  while(*ori)            //mientras la palabra 1 no termine
+  {
+      *dest = *ori;    //cargo en el primer lugar donde apunta dest lo que apunta ori (la primer letra)
+
+     *ori ++;           //aumento el puntero ahora apunta a la segunda letra
+     *dest++;          //aumento el puntero ahora apunta a la segunda letra
+
+  }
+    *dest = '\0';       //termino con la palabra 1 entoces en destino pongo un final lo que hace es cortarla para que no aparezca contenido de dest si esta era mas larga que ori
+
+    return *dest;      //Devuelvo lo apuntado por dest
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+/*/
+mi Strchr busca en la cadena un elemento y devuelve lo que esta despues de ese elemento
+
+*/
+char  *miStrchr(const char *ori, int c)
+{
+   while(*ori != (char )c )
+    {
+      //  if(!*ori++) return 0;
+      if(!*ori)
+      {
+        return 0;
+      }else{
+
+        ori ++;
+      }
+    }
+
+
+    return (char *)ori;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+/// Comparar es strcmp y te dice si 2 textos son iguales
+int comparar(char *texto1, char *texto2)
+{
+    if((texto1 == NULL)||(texto2 == NULL)) return 0;
+
+    while(*texto1 || *texto2)
+    {
+        if(*texto1==*texto2)
+        {
+            *texto1 ++;
+            *texto2 ++;
+        }else
+            {
+
+                return -1;
+            }
+
+    }
+
+
+    return 1;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+int esBlanco(char c)
+{
+
+    return c == ' ' || c== '\t'
+}
+/////////////////////////////////////////////////////////////////////////////////////
+char * Normalizar(char *s)
+{
+    char *ori = s;                  //cargo el texto en las variables
+    char *dest= s;
+
+    while(*ori)                     //mientras halla letras
+    {
+        while(esBlanco(*ori))               //si es blanco aumento hasta que no sea mas blanco y halla alguna letra
+        {
+            *ori++;
+        }
+        if(*ori)                            //si todavia queda texto por leer
+        {
+            *dest = aMayuscula(*ori);       // la primer letra debe ser mayuscula
+            *dest ++;                       //aumento la posicion
+            *ori ++;                        //aumento la posicion
+            while(!esBlanco(*ori) && *ori)          // si no es blanco y todavia hay letras para leer
+            {
+                *dest = aMinuscula(*ori);           //la segunda letra debe ser minuscula
+                *dest++;                            // aumento las posiciones y todas las letras que siguen son minusculas
+                *ori++;
+            }
+            if(esBlanco(*ori))                  //si es blanco hay un espacio
+            {
+                *dest = ' ';                    //coloco el espacio y aumento la posicion a ver que hay desp
+                dest++;
+                ori ++;
+            }
+        }
+    }
+
+    if(dest > s && *(dest -1)== ' ')
+    {
+        *dest --;
+    }
+
+        *dest = '\0';
+
+    return s;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+char aMayuscula(char c)
+{
+if(c >= 'a' && c<='z')
+{
+    c -=32;
+}
+return c;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+char aMinuscula(char c)
+{
+if(c >= 'A' && c<='Z')
+{
+    c +=32;
+}
+return c;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Convierte int en string
+char* miItoa(char *s, int num, int base)
+{
+
+    char *fin;
+    char *ini = s;
+    char aux;
+    unsigned n;
+    char c[]= {"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+
+    if(num < 0 && base == 10)
+    {
+     *ini = '-';
+     ini ++;
+     num -=  num;
+    }
+    fin = ini;
+
+    n = (unsigned)num;
+
+    do
+    {
+     *fin = c[n%base];
+     fin ++;
+     n /=base;
+
+    }while(n);
+    *fin = '/0';
+
+    fin --;
+    while(ini <fin)
+    {
+        aux = *ini;
+        *ini = *fin;
+        *fin = aux;
+        ini++;
+        fin ++;
+    }
+    return s;
+
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// INVIERTE LA CADENA
+char * invertirCadena(char *cad)
+{
+char *aux=cad;
+char *inicio = cad;
+char inter;
+
+ while(*aux)
+ {
+    aux++;
+ }
+printf("\n llego");
+ aux--; //  por q esta en \0
+
+ while(aux>cad)
+   {
+    inter=*cad;
+    *cad=*aux;
+    *aux=inter;
+    aux--;
+    cad++;
+   }
+
+ return inicio;
+}
+
+////////////////////////////////////////////////////////////
+char* miStrstr(char *str, char *substr)
+{
+	  while (*str)
+	  {
+		    char *comienzo = str;
+		    char *aux = substr;
+
+		    while (*str && *aux && *str == *aux)
+			{
+			      str++;
+			      aux++;
+		    }
+
+		    if (!*aux)
+		    	  return comienzo;
+
+		    str = comienzo + 1;
+	  }
+	  return NULL;
+}
+
+//// ATOI    /////////////////////////////////////////////////////
+int miAtoi(const char *c)
+{
+    int value = 0;
+    int sign = 1;
+    if( *c == '+' || *c == '-' )
+    {
+        if( *c == '-' ) sign = -1;
+        c++;
+    }
+    while (isDigito(*c))
+    {
+        value *= 10;
+        value += (int) (*c-'0');
+        c++;
+    }
+    return (value * sign);
+}
+
+int isDigito(char *c)
+{
+    if( c >= '0' && c <= '9'  )
+    {
+        return 1;
+    }else{
+        return 0;
+    }
+
+}
+
+
+
+////Anita lava la tina
+
+int es_palindromo(const char *cad)
+{
+char *ori = cad;
+char *dest = cad;
+
+while(*ori){
+    ori ++;
+}
+*ori --;
+while(ori>cad){
+if(esBlanco(*ori)){
+  ori --;
+}
+if(esBlanco(*dest)){
+  dest ++;
+}
+*dest = aMinuscula(*dest);
+printf("%c",*ori);
+printf("%c",*dest);
+
+if(*ori != *dest)
+{
+    return 0;
+}else{
+    ori--;
+    dest++;
+}
+}
+    return 1;
+}
+
+/*
+Desarrollar la función comprimir cadena, que viene con varias letras mayúsculas consecutivas y debe quedar con el formato:
+<Letra><num de apariciones consecutivas (1 a 9)>. La cadena debe quedar comprimida en la misma cadena que se pasó por parámetro.
+Ej.: PPPPPAAGGGGABBBBBBBB -> P5A2G4A1B8
+
+*/
+
+char * comprimirCadena(char *cad){
+char *aux = cad;
+char *test = "0123456789";
+char *cantu = test;
+char inter;
+printf("\n");
+while(*aux){
+   if(*cad == *aux){
+    aux ++;
+    cantu ++;
+   }else{  //cad en p. aux en a y cant 5
+    inter = *aux;
+    aux--;
+    *cad=*aux;
+    cad++;
+    *cad = *cantu ;
+    cad ++;
+    *cad = inter;
+    aux++;
+    cantu = test;
+   }
+}
+ inter = *aux;
+ aux--;
+ *cad=*aux;
+ cad++;
+ *cad = *cantu ;
+ cad ++;
+ *cad = inter;
+return  *cad;
+
+}
+
+///// STRCAT
+void mi_strcat(char *pri , const char *seg){
+  while(*pri){
+    pri++;
+  }
+  while(*seg){
+    *pri = *seg;
+    pri++;
+    seg++;
+  }
+  *pri = '\0';
+
+}
+
+Ejercicio 4: Realizar una función que concatene dos cadenas. Como strcat, el resultado debe quedar
+en la cadena 1, pero esta vez, la cadena 2 debe quedar antes que la cadena 1.
+No debe utilizar memoria auxiliar.
+Utilice notación y aritmética de punteros.
+No utilice funciones de biblioteca.
+Desarrollar un main que invoque a la función y muestre su resultado.
+Ej: cad1= “mundo!” cad2= ”Hola “
+Res: cad1= “Hola mundo!”
+void mi_strcat_poniendo_primero_lo_de_s2(char *pri ,  char *seg){
+char *aux = pri;
+char *aux2 = seg;
+
+while(*seg){
+    seg++;
+  }
+   //voy al final
+  while(*aux){
+    *seg = *aux;   //pongo  lo que hay en la segunda
+    aux++;
+    seg++;
+  }
+  *seg = '\0'; //al final pongo el \0
+
+ while(*aux2){
+    *pri =  *aux2;
+    aux2++;
+    pri++;
+  }
+
+  *pri = '\0'; //al final pongo el \0
+
+}
+
+
+
+
+
+//Calcula el número de caracteres de una subcadena inicial apuntada por s1 que consiste
+//en todos los caracteres formados en la cadena apuntada por s2.
+int mistrcspn(const char *s1, const char *s2)
+{
+    const char *aux=s1;
+    const char *aux2=s2;
+    int cont=0;
+    int primercaracter=strlen(s1);
+    while(*aux2)
+    {
+
+        while(*aux)
+        {
+            if(*aux==*aux2&&primercaracter>cont)
+            {
+                primercaracter=cont;
+            }
+            aux++;
+            cont++;
+        }
+        aux=s1;
+        aux2++;
+        cont=0;
+    }
+
+    return primercaracter;
+}
+
+//Calcula el número de caracteres de la cadena apuntada por s.
+size_t mi_strlen(const char *s){
+size_t cont =0;
+
+while(*s){
+    s++;
+    cont++;
+}
+return cont;
+
+}
+
+//Convierte la porción inicial de la cadena apuntada por numPtr a una representación de int.
+int mi_atoi(const char *numPtr)
+{
+    int num=0;
+    char *aux=(char*)numPtr;
+    while(*aux!='\0')
+    {
+        num=num*10+(int)(*aux)-'0';
+        aux++;
+    }
+    return num;
+}
+
+//Convert integer to string (non-standard function)
+//Converts an integer value to a null-terminated string using the
+//specified base and stores the result in the array given by str parameter.
+void mi_itoa( int  num ,char  * cad,int base)
+{
+    char* ini=cad;
+    while(num>0)
+    {
+        *ini=(num%base)+'0';
+        num=num/base;
+        ini++;
+    }
+    *ini='\0';
+
+}
+
+
+
+//Localiza la primera aparición en la cadena apuntada por s1 de la secuencia de
+//caracteres (excluyendo el carácter nulo) en la cadena apuntada por s2.
+char* mi_strstr(char *str, char *substr)
+{
+	  while (*str)
+	  {
+		    char *comienzo = str;
+		    char *aux = substr;
+
+		    while (*str && *aux && *str == *aux)
+			{
+			      str++;
+			      aux++;
+		    }
+
+		    if (!*aux)
+		    	  return comienzo;
+
+		    str = comienzo + 1;
+	  }
+	  return NULL;
+}
+
+
+
+/*
+Ejercicio 3:
+Desarrolle una función que realice, dentro de una cadena, el reemplazo de todas las ocurrencias de una subcadena por otra. El resultado debe ser entregado en una cadena aparte. Tenga en cuenta que las cadenas pueden ser de cualquier largo. Utilice aritmética y notación de punteros, no utilice funciones de biblioteca.
+Ej:
+Cadena: “Desarrolle una función que realice, dentro de una cadena, el reemplazo de todas las ocurrencias de una
+subcadena por otra”
+Buscar: “cadena”	Reemplazar por: “string”
+
+Resultado: “Desarrolle una función que realice, dentro de una string, el reemplazo de todas las ocurrencias de una substring por otra”
+*/
+void* mi_replace_ocurrencia_cad(char *str, char *substr, char *remplazo)
+{
+    int count = 0;
+
+	  while (*str)
+	  {
+		    char *comienzo = str;
+		    char *aux = substr;
+		    char *auxRempl = remplazo;
+
+		    while (*str && *aux && *str == *aux)
+			{
+			      count++;
+			      str++;
+			      aux++;
+		    }
+
+		    if (!*aux){
+                while(count!=0){
+                  str--;
+                  count --;
+                }
+                while(*auxRempl){
+                  *str = *auxRempl;
+                   str++;
+                   auxRempl++;
+                }
+		    }else{
+                count =0;
+                str++;
+		    }
+	  }
+
+}

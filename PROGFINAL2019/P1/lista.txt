@@ -1,0 +1,352 @@
+
+/*
+
+/// LISTA ////////////////////////////////////////////////////
+
+
+typedef int tInfoL;
+
+typedef struct sNodoL
+{
+    tInfoL info;
+    struct sNodoL *sig;
+
+}tNodoL;
+
+
+typedef tNodoL *tLista;
+
+
+*/
+
+
+
+
+//// la lista funciona masomenos como la cola dinamica solo solo que no hay prioridad de salida, la puedo recorrer
+////  |__|---->  |__|-> |__|-> |__|->
+////  pLista     nodo   nodo    nodo
+
+
+
+void crearLista(tLista *p)
+{
+
+    *p == NULL;
+}
+
+int listaVacia(tLista *p)
+{
+    return *p == NULL;
+}
+
+
+int listaLlena(tLista *p)
+{
+    tNodoL *aux;
+
+    aux = (tNodoL *)malloc(sizeof(tNodoL));
+
+    if(aux == NULL ) return 0;
+
+    free(aux);
+
+    return 1;
+
+}
+
+
+int insertarAlPrincipioLista(tLista *p, tInfoL *d)
+{
+    tNodoL *nue;                             // creo un nuevo nodo
+
+    nue = (tNodoL *)malloc(sizeof(tNodoL));   // reservo memoria para ese nodo
+
+    if(nue == NULL) return 0;               // si no pude reservar salgo
+
+
+    nue->info = *d;                         //  en nue info pongo el dato
+    nue->sig = *p;                         // en nue sig pongo lo que apunta la lista
+
+    *p = nue;                          // finalmente hago que la lista apunte al nuevo nodo
+
+    return 1;
+
+}
+
+
+int insertarAlFinal(tLista *p, tInfoL *d)
+{
+  
+
+    while(*p)
+    {
+        p = &(*p)->sig;                     // me voy corriendo hasta el final una vez encontrado el final
+    
+    }
+
+      *p = (tNodoL *)malloc(sizeof(tNodoL)); // genero un nuevo nodo
+      (*p)->info = *d;                       // le cargo la info
+      (*p)->sig = NULL;                     // hago que sig apunte al final por que es el ultimo elemento
+    return 1;
+}
+
+void vaciarLista(tLista *p)
+{
+ tNodo *aux;
+
+
+ while(*p)              // mientras halla algo en la lista
+ {
+     aux = *p;         // cargo a aux con lo que hay en lista
+     *p= aux->sig;            // y pongo a la lista a apuntar al siguiente de aux
+     free(aux);
+ }
+
+}
+
+void recorrerLista(tLista *p)
+{
+    while(*p)
+    {
+        //mostrar
+        p = &(*p)->sig;
+    }
+}
+
+
+int insertarEnOrden(tLista *p,const tInfoL *d, int (* comparar)(const tInfoL *a, const tInfoL *b))
+{
+
+    tNodo *nue;
+
+    nue = (tNodoL *)malloc(sizeof(tNodoL));
+
+    if(nue == NULL ) return 0;
+
+
+    while(*p && comparar(*d, &(*p)->info)>0)
+    {
+         p=&(*p)->sig;
+
+    }
+
+        nue->info = *d;
+
+        nue->sig = *p;
+
+        *p=nue;
+
+    return 1;
+
+}
+
+
+int comparar (const int *a, const int *b)
+{
+
+    return *a - *b;
+}
+
+////////////////// Eliminar un elemento ///////////////
+int eliminarUnelementoDeLaLista(tLista *pl,int elemn, int (*compararXnroReg)(tInfo *,int))
+{
+
+tNodoL *aux;
+while(*pl)
+{
+aux = *pl;
+
+    if(compararXnroReg(&(*pl)->info,elemn) == 0)
+    {
+        printf("\n Encontre el elemento");
+        *pl = (*pl)->sig;
+        free(aux);
+    }
+  pl = &(*pl)->sig;
+
+}
+return 1;
+}
+
+
+////////////// ordenar ////////////////////////////////////////////////
+No funciona pero masomenos es asi
+void ordenarLista(tLista *pl, int (* comparar)(tInfo *, tInfo *))
+{
+    int marca = 1;
+
+    if(*pl)
+    {
+        while(marca)
+        {
+            tLista *q = pl;
+            marca = 0;
+
+            while((*pl)->sig)
+            {
+                printf("\n while");
+                if(comparar(&(*q)->info,&(*pl)->sig->info) >0 )
+                {
+                    tNodoL *act = *q;
+                    tNodoL *sig = act->sig;
+                    tNodoL *sigsig = sig->sig;
+
+                    marca = 1;
+                    *q = sig;
+                    act->sig = sig->sig;
+                    sig->sig = act;
+
+                }
+              q = &(*q)->sig;
+
+            }
+        }
+
+    }
+
+}
+
+///  TAMPOCO ANDA //////////////////////
+
+int eliminarUnicosDeUnaListaNoOrdenada(tLista *pl, int (* comparar)(tInfo *, tInfo *))
+{
+    tLista *q =pl;
+    int veces, count = 0;
+
+    while(*q)
+    {
+        tNodoL *aux = *pl;
+        veces = 2;
+
+        while(veces && aux)
+        {
+            if(comparar(&aux->info, &(*pl)->info) == 0)
+            {
+                veces --;
+                aux = aux ->sig;
+
+            }
+            if(veces == 1)
+            {
+                aux = *q;
+                *q =aux->sig;
+                count ++;
+                free(aux);
+            }
+            q = &(*q)->sig;
+        }
+    }
+    return count;
+}
+
+
+///// sacar primero de lista ///////////////////
+
+int sacarPrimerElementoDeLista(tLista *pl, tInfo *d){
+tNodo *aux;
+aux = (tNodo *)malloc(sizeof(tNodo));
+if(!aux) return 0;
+aux = *pl; // igualo aux a la lista
+*d = aux->info; //pongo el dato
+*pl = aux->sig; // apunto la lista al siguiente de la misma
+free(aux;)      // libero la memoria
+return 1;
+
+}
+
+
+// solo borra la primer ocurrencia (sin duplicados, lista no ordenada)
+int sacarElementoDeLista(tLista *p, tInfo *d, int (* comp)(const tInfo *, const tInfo *))
+{
+tNodo *pelim;
+if(!*p) return 0;
+
+while(*p && comp(d,&(*p)->info)!=0){ //mientras sea diferente de 0 sigo buscando
+    p = &(*p)->sig;  //recorrer lista
+}
+pelim = *p;
+*d = pelim->info; // por si quiero sacar la info de la lista para usarla
+*p = pelim->sig; //ensamblo la lista apunto al siguienete del que elimino asi lo salteo
+free(pelim);
+return 1;
+}
+
+
+
+// solo borra la primer ocurrencia (sin duplicados, lista  ordenada)
+int sacarElementoDeLista2(tLista *p, tInfo *d, int (* comp)(const tInfo *, const tInfo *))
+{
+tNodo *pelim;
+int cmp = 1;
+while(*p && (cmp = comp(d,&(*p)->info))>0){ //mientras sea diferente mayor a 0 sigo buscando
+    p = &(*p)->sig;  //recorrer lista
+}
+if(!*p || cmp) return 0;
+pelim = *p;
+*d = pelim->info; // por si quiero sacar la info de la lista para usarla
+*p = pelim->sig; //ensamblo la lista apunto al siguienete del que elimino asi lo salteo
+free(pelim);
+return 1;
+}
+
+// no valida duplicados
+int insertarElementoEnListaOrdenado(tLista *p,const tInfo *d, int (* comp)(const tInfo *, const tInfo *))
+{
+tNodo *nue;
+int cmp = 1;
+
+while(*p && (cmp = comp(d,&(*p)->info))> 0 ){ // comparo para insertar
+    p = &(*p)->sig;
+}
+nue = (tNodo *)malloc(sizeof(tNodo));
+if(!nue) return 0;
+nue->info = *d;
+nue->sig = *p;
+*p = nue;
+
+return 1;
+}
+
+//valida duplicados
+int insertarElementoEnListaOrdenadaSinDuplicados(tLista *p,const tInfo *d, int (* comp)(const tInfo *, const tInfo *))
+{
+tNodo *nue;
+int cmp = 1;
+
+while(*p && (cmp = comp(d,&(*p)->info))> 0 ){ // comparo para insertar
+    p = &(*p)->sig;
+}
+if(*p && !cmp) return 0; //validacion de duplicados
+nue = (tNodo *)malloc(sizeof(tNodo)); //pido memoria aca por si sale antes y no puedo devolver la memoria
+if(!nue) return 0;
+nue->info = *d;
+nue->sig = *p;
+*p = nue;
+
+return 1;
+}
+
+
+// inserta un elemento en la lista y si es duplicado actualiza la informacion de ese elemento
+int insertarElementoEnListaOrdenadaYActualizar(tLista *p,const tInfo *d,
+                                               int (* comp)(const tInfo *, const tInfo *),
+                                               int (* actu)(tInfo *, const tInfo *))
+{
+tNodo *nue;
+int cmp = 1;
+
+while(*p && (cmp = comp(d,&(*p)->info))> 0 ){ // comparo para insertar
+    p = &(*p)->sig;
+}
+if(*p && !cmp) {
+    actu(&(*p)->info,d);
+    return 1;
+}
+nue = (tNodo *)malloc(sizeof(tNodo)); //pido memoria aca por si sale antes y no puedo devolver la memoria
+if(!nue) return 0;
+nue->info = *d;
+nue->sig = *p;
+*p = nue;
+
+return 1;
+}

@@ -1,0 +1,387 @@
+bueno quiero dejar  lo que tengo hecho de lista doble por ahi alguno esta por recuperar el 2do parcial  y pueda ayudar a alguien o le queda para la cursada que viene xD
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct
+{
+    int dni;
+    char nom[30];
+    int notas[20];
+    int cant_materias;
+
+} t_alumno;
+typedef t_alumno t_info;
+
+typedef struct s_nodo
+{
+    t_info info;
+    struct s_nodo *ant,*sig;
+} t_nodo;
+typedef t_nodo * t_listadoble;
+
+void crear_lista(t_listadoble *lista);
+int insertar_al_inicio(t_listadoble *lista,t_info *dato);
+int insertar_ordenado(t_listadoble* lista,t_info *dato,int (*comparar) (t_info *,t_info *));
+
+int eliminar_primero(t_listadoble * lista, t_info *dato_eliminado);
+int eliminar_ultimo(t_listadoble * lista,t_info * dato_eliminado);
+int eliminar_por_clave(t_listadoble * lista, t_info * dato_eliminado,t_info *clave,int (*comparar) (t_info *,t_info *));/** elimino pensando por dni que la clave es el dni**/
+int eliminar_duplicados_ordenados(t_listadoble * lista,t_info *dato_eliminado);/** elimino pensando por dni si tiene duplicados y devuelve el ultimo eliminado**/
+int eliminar_duplicados_desordenados(t_listadoble *lista, t_info * dato_eliminado);/** elimino pensando por dni si tiene duplicados y devuelve ultimo eliminado**/
+
+
+void ordenar(t_listadoble *lista);
+void mostrar(t_listadoble *lista);
+int comparar(t_info *, t_info *);
+
+int main()
+{
+
+    t_listadoble lista;
+    //t_info eliminado,clave;
+    crear_lista(&lista);
+    t_info datos[7]= { {39,"vogelnahuel",{7,8,7,6},4},
+        {44,"vww",{7,8,9,6},4 },
+        { 22,"sss",{2,5,4},3}
+        , {77,"aaa",{7,8},2}
+        ,{11,"eee",{7,8,7,6,8,9,8,7},8}
+        ,{66,"yyy",{7,8,7,6,9,10,10,10,10},9}
+        , {11,"zzz",{4,10,10,10,10,10,10},7}
+    };
+
+    int i;
+    for(i=0; i<7; i++)
+    {
+        insertar_al_inicio(&lista,&datos[i]);
+    }
+    //clave.dni=77;
+   // eliminar_por_clave(&lista,&eliminado,&clave,comparar);
+    //eliminar_duplicados_ordenados(&lista,&eliminado);
+   // ordenar(&lista);
+  // eliminar_duplicados_desordenados(&lista,&eliminado);
+    mostrar(&lista);
+
+    return 0;
+}
+int eliminar_duplicados_desordenados(t_listadoble * lista,t_info *dato_eliminado)
+{
+    
+    t_nodo *act,*ant,*sig,*si_es_duplicado;
+    int cambio=0;
+    act=*lista;
+    if(*lista==NULL)
+    {
+        return -1;
+    }
+    while((*lista)->sig!=NULL)
+    {
+        act=(*lista)->sig;
+        ant=*lista;
+        si_es_duplicado=*lista;
+        while(act!=NULL)
+        {
+            
+            if( si_es_duplicado->info.dni==act->info.dni )
+            {
+                ant=act->ant;
+                sig=act->sig;
+                si_es_duplicado=act;
+                cambio=1;/**resultado de cmp de comparar seria */
+            }
+            
+            act=act->sig;
+        }
+        
+        
+        
+        if(cambio!=1)
+        lista=&(*lista)->sig;
+        else
+        {
+            if(ant!=NULL)
+                ant->sig=sig;
+            if(sig!=NULL)
+            sig->ant=ant;
+            free(si_es_duplicado);
+            cambio=0;
+        }
+    }
+
+    
+    
+    return 1;
+}
+void ordenar(t_listadoble *lista)
+{
+    t_nodo *act,*ant,*sig,*menor;
+    int cambio=0;
+    act=*lista;
+    if(*lista==NULL)
+    {
+        return;
+    }
+    while((*lista)->sig!=NULL)
+    {
+        act=(*lista)->sig;
+        ant=*lista;
+        menor=*lista;
+        while(act!=NULL)
+        {
+            
+            if( menor->info.dni>act->info.dni )
+            {
+                ant=act->ant;
+                sig=act->sig;
+                menor=act;
+                cambio=1;/**resultado de cmp de comparar seria*/
+            }
+            
+            act=act->sig;
+        }
+        
+        
+        
+        if(cambio!=1)
+        lista=&(*lista)->sig;
+        else
+        {
+            if(ant!=NULL)
+                ant->sig=sig;
+            if(sig!=NULL)
+            sig->ant=ant;
+            menor->ant=(*lista)->ant;
+            menor->sig=(*lista);
+            (*lista)->ant=menor;
+            *lista=menor;
+            cambio=0;
+        }
+    }
+
+}
+int eliminar_duplicados_ordenados(t_listadoble* lista, t_info* dato_eliminado)
+{
+    t_nodo *act,*ant,*sig,*eliminado;
+    int cambio=0;
+    act=*lista;
+    if(act!=NULL)
+    {
+        while( (act)->ant!=NULL)
+             {
+                    act=act->ant;
+             }
+
+        while(act->sig!=NULL)
+        {
+            sig=act->sig;
+            if( act->info.dni == sig->info.dni )
+            {
+                ant=act;
+                eliminado=sig;
+                sig=sig->sig;
+                cambio=1;/** este no haria falta seria el resultado de la comparacion == 0 de la funcion comparar no la hice por falta de ganas xD*/
+            }
+            
+            
+            
+            if(cambio!=1)
+            act=act->sig;
+            else
+            {
+                free(eliminado);
+                if(ant!=NULL)
+                ant->sig=sig;
+                if(sig!=NULL)
+                sig->ant=ant;
+                cambio=0;
+            }
+            
+        }
+        
+        
+    }
+    else
+    return -1;
+    
+    return 1;
+}
+int insertar_ordenado(t_listadoble* lista, t_info* dato,int (*comparar) (t_info *,t_info *))
+{
+    t_nodo* pauxant,*pauxsig;
+    int cmp;
+    if(*lista!=NULL)
+    {
+            while( ( (cmp =comparar( &(*lista)->info,dato) >0))&&(*lista)->ant!=NULL)
+             {
+                    lista=&(*lista)->ant;
+             }
+
+        while( ( (cmp =comparar( &(*lista)->info,dato)) <0)&&(*lista)->sig!=NULL )
+        {
+                    lista=&(*lista)->sig;
+        }
+
+        if(cmp>0)
+            {
+                
+             
+           pauxant=(*lista)->ant;
+            pauxsig=*lista;
+            }
+        else if(cmp<=0)
+            {
+      
+          pauxant=*lista;
+        pauxsig=(*lista)->sig;
+            }
+             
+        /*else
+         {
+            return -1;///duplicado por s no queres meter duplicados
+             }*/
+    }
+    else
+    {
+        pauxsig=pauxant=NULL;
+    }
+    
+        t_nodo *aux=(t_nodo*)malloc(sizeof(t_nodo));
+         if(aux==NULL)
+           return -1;
+         aux->info=*dato;
+         aux->ant=pauxant;
+         aux->sig=pauxsig;
+         if(pauxant!=NULL)
+        pauxant->sig=aux;
+        if(pauxsig!=NULL)
+            pauxsig->ant=aux;
+            *lista=aux;
+            return 1;
+}
+
+int comparar(t_info * a, t_info * b)
+{
+
+    return (a->dni-b->dni);
+}
+int eliminar_por_clave(t_listadoble* lista, t_info* dato_eliminado, t_info* clave,int (*comparar) (t_info*,t_info*))/**la clave seria en este caso dni*/
+{
+    t_nodo *ant,*sig,*act=*lista;
+    int cmp;
+    if(*lista!=NULL)
+    {
+
+      /** me muevo hasta encontrar donde esta la clave**/
+        while( act->sig!=NULL&&( (cmp =comparar( &act->info,clave)) !=0) )
+        {
+            act=act->sig;
+        }
+        while( act->ant!=NULL&&( (cmp =comparar( &act->info,clave)) !=0))
+        {
+            act=act->ant;
+        }
+
+
+        if(cmp==0)/**si existe la clave*/
+        {
+            ant=act->ant;
+            sig=act->sig;
+            *dato_eliminado=act->info;
+
+            free(act);
+            if(sig!=NULL)
+            {
+                act=sig;
+                sig->ant=ant;
+            }
+            if(ant!=NULL)
+            {
+                act=ant;
+                ant->sig=sig;
+            }
+            if(ant==NULL&&sig==NULL)
+            {
+                act=NULL;
+            }
+
+        }
+    }
+    return -1;
+}
+int eliminar_ultimo(t_listadoble* lista, t_info* dato_eliminado)
+{
+    t_nodo *aux;
+    if(*lista!=NULL)
+    {
+        while( (*lista)->sig!=NULL)
+            lista=&(*lista)->sig;
+
+        aux=*lista;
+        *dato_eliminado=aux->info;
+        *lista=aux->ant;
+        (*lista)->sig=NULL;// o null total aux->ant al ser el primero ant == null
+        free(aux);
+    }
+    return -1;
+}
+int eliminar_primero(t_listadoble* lista, t_info* dato_eliminado)
+{
+    t_nodo *aux;
+    if(*lista!=NULL)
+    {
+        while( (*lista)->ant!=NULL)
+            lista=&(*lista)->ant;
+
+        aux=*lista;
+        *dato_eliminado=aux->info;
+        *lista=aux->sig;
+        (*lista)->ant=aux->ant;// o null total aux->ant al ser el primero ant == null
+        free(aux);
+    }
+    return -1;
+}
+
+
+void crear_lista(t_listadoble *lista)
+{
+    *lista=NULL;
+}
+int insertar_al_inicio(t_listadoble* lista, t_info* dato)
+{
+    t_nodo *aux=(t_nodo*)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return -1;
+    aux->info=*dato;
+
+    if(*lista==NULL)
+    {
+        aux->ant=aux->sig=NULL;
+        *lista=aux;
+    }
+    else
+    {
+        aux->sig=*lista;
+        aux->ant=(*lista)->ant;
+        (*lista)->ant=aux;
+        *lista=aux;
+    }
+    return 1;
+}
+void mostrar(t_listadoble* lista)
+{
+    if(*lista!=NULL)
+    {
+
+
+        while((*lista)->ant!=NULL)
+            lista=&(*lista)->ant;
+
+        puts("muestra dni:");
+        while((*lista)!=NULL)
+        {
+            printf("%d\n",(*lista)->info.dni);
+            lista=&(*lista)->sig;
+        }
+    }
+
+}

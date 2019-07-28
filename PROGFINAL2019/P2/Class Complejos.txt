@@ -1,0 +1,206 @@
+
+///// Complejo.h /////////////////////////////////////////////////////////////////////////////
+
+#include <string.h>
+#include <iostream>
+
+using namespace std;
+
+
+
+class Complejo{
+
+private:
+
+    float real;
+    float ima;
+
+
+public:
+
+    //Complejo();
+    //Complejo(float, float );
+
+    Complejo(float = 0 , float = 0); // opcionalidad //los 2 anteriores son redundantes si existe este
+
+    Complejo(const Complejo &); //constructor de copia
+
+    Complejo & operator =(const Complejo &); // modifica la funcion que cumple el = con este objeto
+
+    Complejo  operator +(const Complejo &) const; // redefino el operador + // no va & al principio por que el llamador no va a ser modificado
+
+    Complejo  operator +(float) const;
+
+    Complejo  operator ++(int); /// post incremento
+
+    Complejo & operator ++(); /// pre incremento
+
+    friend istream & operator >>(istream &, Complejo &);
+
+   friend ostream & operator <<(ostream &, const Complejo &); //cout<<c1<< endl
+   friend Complejo operator+(float , const Complejo &); //c1 = 1 + c2
+
+    void mostrar();
+    void setReal(float );
+    void setImaginario(float );
+
+    float  getReal();
+    float  getImaginario();
+
+};
+
+
+///// Complejo.c /////////////////////////////////////////////////////////////////////////////
+
+
+Complejo :: Complejo (float real, float ima)
+{
+    this->real = real;
+    this->ima  = ima;
+};
+
+/*
+Complejo :: Complejo()
+{
+    real = 0;
+    ima = 0;
+};
+*/
+
+Complejo :: Complejo(const Complejo &obj) //  constructor de copia
+{
+    real = obj.real;
+    ima = obj.ima;
+};
+
+
+Complejo & Complejo :: operator =(const Complejo & obj) // modifica la funcion que cumple el = con este objeto
+{
+  real = obj.real;
+  ima = obj.ima;
+
+  return *this;
+
+};
+
+Complejo Complejo :: operator +(const Complejo & obj) const
+{
+    Complejo aux(*this); // creo un objeto nuevo por que NO voy a modificar el llamador
+
+    aux.real += obj.real;
+    aux.ima += obj.ima;
+
+    return aux;
+};
+
+Complejo Complejo :: operator +(float n) const
+{
+  Complejo aux(*this);
+
+  aux.real += n;
+
+ return aux;
+};
+
+Complejo Complejo ::  operator ++(int) // Post incremento devuelve tal cual estaba antes, luego  se ve reflejado el incremento
+{
+    Complejo aux(*this);
+
+    real ++;
+    ima ++;
+
+    return aux;
+}
+
+
+Complejo & Complejo ::  operator ++() // Pre incremento devuelve a si mismo modificado
+{
+    real ++;
+    ima ++;
+
+    return *this;
+
+}
+
+// como es una funcion amiga no lleva Complejo ::
+ostream & operator <<(ostream & salida, const Complejo & obj)
+{
+  salida << "("<<obj.real<<";"<<obj.ima<<")";  // para devolver (1;2) ej
+  return salida;
+
+};
+
+
+ istream & operator >>(istream &input, Complejo &obj)
+ {
+     float a,b;
+     cout << "Ingrese valor real" <<endl;
+     input >> a;
+     cout << "Ingrese valor imaginario" <<endl;
+     input >> b;
+     obj.setReal(a);
+     obj.setImaginario(b);
+
+     return input;
+
+ }
+
+
+
+
+
+Complejo operator+(float n, const Complejo &obj)
+{
+    Complejo aux(n + obj.real, obj.ima);
+
+    return aux;
+};
+
+
+
+void Complejo :: setReal(float real)
+{
+    this->real = real;
+
+};
+
+void  Complejo :: setImaginario(float ima)
+{
+    this->ima = ima;
+
+};
+
+void Complejo :: mostrar()
+{
+    cout << "real: " << real;
+    cout << "imaginario: " << ima << endl;
+};
+
+
+
+
+///// main.c /////////////////////////////////////////////////////////////////////////////
+  Complejo c1, c2(7,8),c3(c2);
+    int a;
+    cout << "Hello world!" << endl;
+
+    c1.setImaginario(-2);
+    c1.setReal(5);
+    c1.mostrar();
+
+    c1 = c2; // se puede por  que redefini el =
+
+    c1 = c2 + c3; // se puede por que redefini el + para sumar objetos
+
+    c1 ++;
+    ++c1;
+
+    cout << c1 << endl;
+
+    c1 = 1 + c2;
+
+    cout << "Ingresar un valor" << endl;
+    cin >> c1;
+
+    cout << c1 << endl;
+

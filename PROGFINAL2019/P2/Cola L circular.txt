@@ -1,0 +1,90 @@
+int insertarColaC(t_colaC *pc, t_info_cola *info)
+{
+    t_nodo *nodo;
+
+    nodo = (t_nodo *)malloc(sizeof(t_nodo));
+if(!nodo) return 0;
+    nodo->info = *info;
+    if(*pc == NULL)
+    {
+        nodo->sig = nodo;
+    }
+    else
+    {
+        nodo->sig = (*pc)->sig;
+        (*pc)->sig = nodo;
+    }
+    *pc = nodo;
+    return 1;
+}
+void crear_cola(t_cola* cola)
+{
+    
+    *cola=NULL;
+}
+int cola_vacia(const t_cola* cola)
+{
+    if(*cola==NULL)
+        return 1;
+    return -1;
+}
+int cola_llena(const t_cola* cola)
+{
+    t_nodo *aux=(t_nodo *)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return 1;
+    free(aux);
+    return -1;
+}
+int poner_en_cola(t_cola* cola, int* d)
+{
+    /** en cola circular  el puntero a cola siempre apunta al ultimo  y el ultimo ->sig al primero*/
+    t_nodo *aux=(t_nodo *)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return -1;
+        aux->dato=*d;
+        if(*cola==NULL)
+        {
+            *cola=aux;
+            aux->sig=*cola;
+        }
+        else
+        {
+            aux->sig=(*cola)->sig;
+            (*cola)->sig=aux;
+            *cola=aux;
+        }
+    
+    return 1;
+}
+
+int sacar_de_cola(t_cola* cola, int* d)
+{
+    /** en cola circular  el puntero a cola siempre apunta al ultimo  y el ultimo ->sig al primero*/
+    t_nodo *aux;
+    if(*cola==NULL)
+        return -1;
+    
+    aux=(*cola)->sig;
+        *d=aux->dato;
+    (*cola)->sig=aux->sig;
+    free(aux);
+    return 1;
+    
+}
+void vaciar_cola(t_cola* cola)
+{
+    t_nodo *aux=*cola;
+    while((*cola)->sig!=aux)
+    {
+            aux=(*cola)->sig;
+            (*cola)->sig=aux->sig;
+            free(aux);
+    }
+    /** como en cola circular no tiene null al final entonces la unica manera de saber si termina es*/
+    /** apuntar al ultimo y si es igual al ultimo salis del while y eliminas el ultimo ej: 2-5-6  apuntar a 6 y si aux=6 entonces salis*/
+    aux=(*cola)->sig;
+    (*cola)->sig=aux->sig;
+    free(aux);
+    
+}

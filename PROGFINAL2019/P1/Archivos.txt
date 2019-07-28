@@ -1,0 +1,652 @@
+
+#include "funciones.h"
+
+
+///Crear archivo binario
+int crearArchivo(char * nombre)
+{
+
+    tPersona pers[] = {{101,"charli",1.67},{203,"lola",1.50},{205,"mari",1.77}};
+
+/// 1) puntero a FILE
+    FILE *fp;
+
+/// 2) modo de apertura
+    fp = fopen(nombre, "wb");
+
+/// 3) que el puntero no sa null
+
+    if(!fp)
+    {
+        fprintf(stderr, "%s \n", "error apertura");  //stdr es la salida de errores
+        return 0;
+    }
+/// 4) Guardar en el  archivo fwrite(lo que voy a guardar, el tamanio de lo q voy a guardar, la cantidad que voy a guardar, el puntero a file)
+
+    fwrite(pers, sizeof(pers),1,fp);
+
+/// 5)Cerrar el archivo
+
+
+    fclose(fp);
+    return 1;
+}
+
+
+
+
+
+///Leer archivo binario
+int leerArchivo(char * nombre)
+{
+
+    tPersona p;
+
+    FILE *fp;
+
+    fp = fopen(nombre, "rb");
+
+
+    if(!fp)
+    {
+        fprintf(stderr, "%s \n", "error apertura");
+        return 0;
+    }
+
+    fread(&p,sizeof(tPersona),1,fp); /// lee 1 solo registro del tipo tpersona
+
+    while(!feof(fp))
+    {
+        mostrarPersona(&p);
+        //printf("[%ld \t %-19s \t %04.2f] \n", p.dni, p.nombre, p.altura);
+
+        fread(&p,sizeof(tPersona),1,fp);
+    }
+    rewind(fp);
+    fclose(fp);
+
+    return 1;
+}
+
+void mostrarPersona(const  tPersona *p)
+{
+
+    printf("[%ld \t %-19s \t %04.2f] \n", p->dni, p->nombre, p->altura);
+
+}
+
+void mostrarEmpleado(const  t_empleado *p)
+{
+
+    printf("\n Empleado: [%ld %s %d/%d/%d %c %s %d] \n", p->dni, p->apyn, p->fingreso.dia, p->fingreso.mes, p->fingreso.anio,p->sexo, p->categoria, p->sueldo);
+
+}
+
+
+///Copiar un archivo binario en otro
+int copiarArchivo(FILE *fp1, FILE *fp2)
+{
+
+    tPersona pers;
+
+
+    rewind(fp1);
+
+    if(!fp1 || !fp2)
+    {
+        fprintf(stderr, "error al crear archivos");
+        return 0;
+    }
+
+    fread(&pers, sizeof(tPersona),1,fp1);
+
+    while(!feof(fp1))
+    {
+        fwrite(&pers, sizeof(tPersona),1,fp2);
+        fread(&pers, sizeof(tPersona),1,fp1);
+    }
+
+
+
+    return 1;
+}
+
+/// Busca por dni (en archivo binario) y lleno la variable p para luego pasarsela a la funcion mostrar y me muestre la persona.
+int buscarPorDni(FILE *fp, tPersona *p)
+{
+    tPersona pers;
+
+    rewind(fp);
+
+    fread(&pers,sizeof(tPersona),1,fp);
+
+    while(!feof(fp))
+    {
+
+        if(pers.dni == p->dni)
+        {
+            *p = pers;
+            return 1;
+        }
+        else
+        {
+            fread(&pers,sizeof(tPersona),1,fp);
+        }
+    }
+
+    return 0;
+}
+
+
+///Actualizar sueldo de arhivo binario filtrando por categoria
+
+void actualizarSueldosXCategoria(FILE *fp,const char *categoria, float porcentage)
+{
+
+    t_empleado auxEmp;
+
+    rewind(fp);
+
+    fread(&auxEmp,sizeof(t_empleado),1,fp);
+
+    while(!feof(fp))
+    {
+        // strcmp devuelve 0 si fue exitoso por eso el ! !0=1
+        if(!strcmp(auxEmp.categoria,categoria))
+        {
+            printf("\n categoria encontrada");
+            //como para comparar tuve que leer y como cuando leo quedo con el puntero adelantado entonces tengo que volver un lugar para actualizar ese reg.
+            fseek(fp, -1 * sizeof(t_empleado),  SEEK_CUR);
+            //actualizo el sueldo
+            auxEmp.sueldo *= porcentage;
+            printf("\n el sueldo ahora es: %d", auxEmp.sueldo);
+            //escribo
+            fwrite(&auxEmp,sizeof(t_empleado),1,fp);
+            // vuelvo a dejar el archivo en modo lectura
+            fseek(fp, 0, SEEK_CUR);
+            fread(&auxEmp, sizeof(t_empleado),1,fp);
+        }
+        // Si categoria no es igual sigo leyendo
+        //printf(" \n categoria no coincide");
+        fread(&auxEmp, sizeof(t_empleado),1,fp);
+    }
+
+}
+
+/// Forma en  que abre los archivos LOPEZ
+int abrirArchivo(FILE **fp, const char *nombre, char *modo, int con_sin)
+{
+    *fp = fopen(nombre,modo);
+
+    if(!*fp)
+    {
+        if(con_sin == CON_MSJ)
+        {
+            fprintf(stderr, "/n Error al  abrir el archivo %s en modo %s ",nombre, modo);
+        }
+        return 0;
+    }
+    else
+    {
+        printf("\n Archivo abierto correctamente");
+        return 1;
+    }
+}
+
+int leerArchivoEmp(FILE *fp)
+{
+
+    t_empleado p;
+
+    //vuelvo a el principio del archivo
+    rewind(fp);
+
+    fread(&p,sizeof(t_empleado),1,fp);  /// lee 1 solo registro del tipo empleado
+
+    //mientras no sea fin de archivo
+    while(!feof(fp))
+    {
+        //muestro
+        mostrarEmpleado(&p);
+        // leo la siguiene linea
+        fread(&p,sizeof(t_empleado),1,fp);
+    }
+
+    return 1;
+}
+
+/// El archivo de texto con datos de long variable usa separadores | para luego poder leerlos
+int crearArchivoTextoLongVariable(FILE *fp)
+{
+
+    int i;
+    t_empleado emp[] = {{1,"roberto",{10,5,1990},'m',"A1",2000}, {13,"maria",{12,6,1995},'f',"B1",2500}, {89,"manuel",{14,6,1999},'m',"A1",6000}};
+
+    printf("\n tamanio de t_empleado %ld", sizeof(t_empleado));
+    printf("\n tamanio de emp %ld", sizeof(emp));
+    printf("\n resultado de la divicion %d",(sizeof(emp)/sizeof(t_empleado)));
+
+    int cantRegs = (sizeof(emp)/sizeof(t_empleado));
+    printf("\n Cant de registros a guardar %d ", cantRegs);
+
+    rewind(fp);
+
+    for(i=0; i<cantRegs; i++)
+    {
+        fprintf(fp,"%ld|%s|%d/%d/%d|%c|%s|%d\n",emp[i].dni,
+                emp[i].apyn,
+                emp[i].fingreso.dia, emp[i].fingreso.mes, emp[i].fingreso.anio,
+                emp[i].sexo,
+                emp[i].categoria,
+                emp[i].sueldo);
+    }
+    return 1;
+}
+
+///Los archivos de texto de long fija se le debe colocar exactamente el tamanio del campo que van  a usar para luego poder leerlo con ese tamanio
+/// Para ello hago el sizeof de la variable empleado y lo divido por el sizeof de la estructura t_empleado y me da la cantidad de empleados que hay.
+int crearArchivoTextoLongFija(FILE *fp)
+{
+
+    int i;
+    t_empleado emp[] = {{1,"roberto",{10,5,1990},'m',"A1",2000}, {13,"maria",{12,6,1995},'f',"B1",2500}, {89,"manuel",{14,6,1999},'m',"A1",6000}};
+
+    printf("\n tamanio de t_empleado %ld", sizeof(t_empleado));
+    printf("\n tamanio de emp %ld", sizeof(emp));
+    printf("\n resultado de la divicion %d",(sizeof(emp)/sizeof(t_empleado)));
+
+    int cantRegs = (sizeof(emp)/sizeof(t_empleado));
+    printf("\n Cant de registros a guardar %d ", cantRegs);
+
+    rewind(fp);
+
+    for(i=0; i<cantRegs; i++)
+    {
+        fprintf(fp,"%08ld%10s%02d%02d%04d%c%2s%9d\n",
+                emp[i].dni,
+                emp[i].apyn,                         //en %s tengo que hacer el sizeof para  que ocupe eso el -1 es por el lugar de '\0'
+                emp[i].fingreso.dia, emp[i].fingreso.mes, emp[i].fingreso.anio,
+                emp[i].sexo,
+                emp[i].categoria,              //en %s tengo que hacer el sizeof para  que ocupe eso el -1 es por el lugar de '\0'
+                emp[i].sueldo);
+    }
+}
+
+/// Lee un archivo de texto cargado con empleados segun su modo,
+
+void leerArchivoTexto(FILE *fp,int modo)
+{
+
+    char linea[200];                        //Declaro el tamanio de linea
+    t_empleado emp;                         // el tipo de dato que voy a leer
+
+    rewind(fp);                             //vuelvo para atras
+
+    while(fgets(linea,sizeof(linea),fp))    //obtengo la linea mientras exista para ir leyendola
+    {
+        char *aux = strchr(linea, '\0');    //busco el final de la linea osea el '\0'
+            if(*aux)                        //si el contenido de aux no es nulo
+            {
+                *aux = '\0';                // pongo el contenido de aux con '\0'
+            }
+
+            if(strlen(linea)== sizeof(linea))   //si la longitud de la linea es igual al tamanio de la linea entonces la linea es muy laraga para ser leida
+            {
+                fprintf(stderr, "Error linea de texto muy larga");
+                return 0;
+            }
+
+
+
+        if(aux > linea && *(aux -1)=='\n')      // si aux es mayor a linea y en el contenido de aux  -1 hay un \n (nueva linea) entoces puedo leer
+        {
+            *(aux-1)  = '\0';                   //  en el lugar de nueva linea le clavo un '\0'
+            if(modo == LONG_VAR)
+            {
+                printf("trozar campos long variable");
+                //printf("%s\n", linea );
+                trozarCamposLongVar(&emp,linea);        // llamo a la funcion que troza y  guarda los campos en sus respectivas variables
+            }
+            else
+            {
+                printf("trozar campos long fija");
+                trozarCamposLongFija(&emp,linea);
+            }
+            mostrarEmpleado(&emp);                      // muestro por pantalla
+            //puts(linesa);                             //  tambien puedo mostrar  la linea con puts(linea)
+        }
+
+    }
+    return 1;
+}
+
+
+///Esta funcion troza los campos y los coloca en sus respectivas variables, esta funcion funciona de a tras hacia adelante
+void trozarCamposLongVar(t_empleado *d, char *s)
+{
+    //// sueldo ///
+    char  *aux = strrchr(s,'|');                //busco el primer '|'
+    sscanf(aux + 1, "%d",&d->sueldo);           //guardo el valor inmediatamente posterior en  la varible usando sscanf
+    *aux = '\0';                                // coloco el contenido de aux con '\0'
+
+    // categoria //
+    aux = strrchr(s,'|');                       // busco el siguiente '\0'
+    strcpy(d->categoria, aux +1);               //copio el string de aux +1 en la variable
+    *aux  = '\0';                               // coloco el contenido de aux con '\0'
+
+    ///// sexo /////
+    aux = strrchr(s,'|');
+    sscanf(aux+1,"%c", &d->sexo);
+    *aux = '\0';
+
+    //// fecha ///
+    aux = strrchr(s,'|');
+    sscanf(aux+1, "%d/%d/%d",&d->fingreso.dia,
+           &d->fingreso.mes,
+           &d->fingreso.anio);
+
+    *aux = '\0';
+
+    ///// apyn ////
+    aux = strrchr(s,'|');
+    strcpy(d->apyn, aux +1);
+
+    *aux = '\0';
+
+    //// dni ///
+    sscanf(s, "%ld", &d->dni);
+
+}
+
+///  Troza los campos del tipo empleado y los coloca en su respectiava variable, va de atras hacia adelante
+void trozarCamposLongFija(t_empleado *d, char *s)
+{
+        //fprintf(fp," %08ld%10s%02d%02d%04d%c%2s%9d \n"......
+
+
+        /*
+                fprintf(fp,"%08ld%10s%02d%02d%04d%c%2s%9d\n",
+                emp[i].dni,
+                emp[i].apyn,
+                emp[i].fingreso.dia, emp[i].fingreso.mes, emp[i].fingreso.anio,
+                emp[i].sexo,
+                emp[i].categoria,
+                emp[i].sueldo);
+        */
+
+
+    //  SUELDO 9 espacios
+    char *aux = strchr(s,'\0');
+    aux -= 9;
+    sscanf(aux,"%d",&d->sueldo);
+    *aux = '\0';
+
+    //  CATEGORIA string usar sizeof
+    //aux -= sizeof(&d->categoria);
+    aux -= 2;
+    strcpy(d->categoria,aux);
+    *aux = '\0';
+
+
+    //sexo  1 espacio
+    aux -= 1;
+    sscanf(aux, "%c",&d->sexo);
+    *aux = '\0';
+
+    //  FECHA 8 espacios 2 dia 2 mes 4 anio
+    aux -= 8;
+    sscanf(aux,"%02d%02d04%d",&d->fingreso.dia,
+                           &d->fingreso.mes,
+                           &d->fingreso.anio);
+
+
+    // APYN string
+    //aux -= sizeof(&d->apyn);
+    aux -= 10;
+    strcpy(d->apyn, aux);
+    //sscanf(aux, "%s",&d->apyn);
+    *aux = '\0';
+
+    //DNI
+    aux -= 8;
+    sscanf(aux,"%ld",&d->dni);
+}
+
+
+
+int MostrarArchivoTxt(FILE *fp2)
+{
+    char linea[200];
+
+
+    if(fp2==NULL)
+        return -1;
+
+    printf("\t \t LECTURA DE ARCHIVO DE TEXTO  \n");
+
+    while((fgets(linea,sizeof(linea),fp2)))
+    {
+        puts(linea);
+    }
+
+    fclose(fp2);
+
+    return 1;
+}
+
+
+/// Esta funcion agarra 2 archivos A y B y los junta formando el archivo C (BINARIOS)
+int fusionIntUnion(FILE *fpa, FILE *fpb, FILE *fpc)
+{
+
+
+int rega;
+int regb;
+rewind(fpa);
+rewind(fpb);
+rewind(fpc);
+
+fread(&rega,sizeof(int),1,fpa);
+fread(&regb,sizeof(int),1,fpb);
+    printf("\n FUSION");
+
+while(!feof(fpa) && !feof(fpb))
+{
+    printf("\n while a && b");
+        if(rega < regb)
+        {
+            printf("\n a < b");
+          fwrite(&rega,sizeof(int),1,fpc);
+          fread(&rega,sizeof(int),1,fpa);
+
+        }else if(rega > regb)
+        {
+            printf("\n a > b");
+          fwrite(&regb,sizeof(int),1,fpc);
+          fread(&regb,sizeof(int),1,fpb);
+        }else{
+            printf("\n a = b");
+          fwrite(&rega,sizeof(int),1,fpc);
+          fread(&rega,sizeof(int),1,fpa);
+
+          fwrite(&regb,sizeof(int),1,fpc);
+          fread(&regb,sizeof(int),1,fpb);
+        }
+}
+
+while (!feof(fpa))
+{
+    printf("\n while solo a");
+    fwrite(&rega,sizeof(int),1,fpc);
+    fread(&rega,sizeof(int),1,fpa);
+
+}
+
+while (!feof(fpb))
+{
+    printf("\n while solo b");
+    fwrite(&regb,sizeof(int),1,fpc);
+    fread(&regb,sizeof(int),1,fpb);
+}
+
+return 1;
+}
+
+
+
+
+/// Esta funcion agarra 2 archivos A y B y los junta formando el archivo C (BINARIOS) con solo los elementos repetidos en ambos archivos
+int fusionIntInterseccion(FILE *fpa, FILE *fpb, FILE *fpc)
+{
+
+
+int rega;
+int regb;
+rewind(fpa);
+rewind(fpb);
+rewind(fpc);
+
+fread(&rega,sizeof(int),1,fpa);
+fread(&regb,sizeof(int),1,fpb);
+    printf("\n FUSION");
+
+while(!feof(fpa) && !feof(fpb))
+{
+    printf("\n while");
+        if(rega == regb)
+        {
+          printf("\n rega   = regb");
+          fwrite(&rega,sizeof(int),1,fpc);
+          fread(&rega,sizeof(int),1,fpa);
+
+          fwrite(&regb,sizeof(int),1,fpc);
+          fread(&regb,sizeof(int),1,fpb);
+        }else{
+        fread(&rega,sizeof(int),1,fpa);
+        fread(&regb,sizeof(int),1,fpb);
+        }
+}
+
+while (!feof(fpa))
+{
+    printf("\n while solo a");
+    fwrite(&rega,sizeof(int),1,fpc);
+    fread(&rega,sizeof(int),1,fpa);
+
+}
+
+while (!feof(fpb))
+{
+    printf("\n while solo b");
+    fwrite(&regb,sizeof(int),1,fpc);
+    fread(&regb,sizeof(int),1,fpb);
+}
+
+
+return 1;
+}
+
+///////////////////////////////////// ARCHIVOS DE TEXTO DE LA FORMA PIOLA PEZZOLA ////////////////////////////////////
+ //////////// LEEER ARCHIVOS DE TEXTO RE PIOLA CON FSCANF///////////////////
+
+
+
+
+int crearArchivoEstudiantesTxtLongVar(const char *nombre, char *modo){
+
+int cantRegs, i;
+FILE *fp;
+t_estudiantes est[] = {{1234,"guala","alan",5.0},
+                {2545,"rocki","cleto",6.7},
+                {3465,"lopez","roberto",8.00},
+                {4767,"chapi","anastacia",4.0},
+                {5643,"lllifaf","lucia",3.6},
+                {6557,"cacal","maria",7.7}};
+ cantRegs = (sizeof(est)/sizeof(t_estudiantes));
+
+    fp = fopen(nombre, modo);
+    if(!fp) return 0;
+for(i=0; i<cantRegs; i++){
+    fprintf(fp,"%ld|%s|%s|%f\n",est[i].dni,
+                                 est[i].apellido,
+                                 est[i].nombre,
+                                 est[i].promedio);
+}
+
+fclose(fp);
+return 1;
+}
+
+
+
+int leerArchivoEstudiantesTxtLongVar(const char *nombre, char *modo)
+{
+FILE *fp;
+t_estudiantes est;
+fp = fopen(nombre,modo);
+if(!fp) return 0;
+
+fscanf(fp,"%ld|%20[^|\n]|%20[^|\n]|%f",&est.dni, &est.apellido, &est.nombre, &est.promedio);
+
+while(!feof(fp))
+{
+ mostrarEstudiante(&est);
+ fscanf(fp,"%*[\n]%ld|%20[^|\n]|%20[^|\n]|%f",&est.dni, &est.apellido, &est.nombre, &est.promedio);
+}
+
+fclose(fp);
+return 1;
+
+}
+
+
+
+
+int crearArchivoEstudiantesTxtLongFija(const char *nombre, char *modo){
+
+int cantRegs, i;
+FILE *fp;
+t_estudiantes est[] = {{1234,"guala","alan",5.4},
+                {2545,"rocki","cleto",6.5},
+                {3465,"lopez","roberto",8.5},
+                {4767,"chapi","anastacia",4.8},
+                {5643,"lllifaf","lucia",3.76},
+                {6557,"cacal","maria",7.9}};
+ cantRegs = (sizeof(est)/sizeof(t_estudiantes));
+
+    fp = fopen(nombre, modo);
+    if(!fp) return 0;
+for(i=0; i<cantRegs; i++){
+    fprintf(fp,"%08ld%20s%20s%04.1f\n",est[i].dni,
+                                 est[i].apellido,
+                                 est[i].nombre,
+                                 est[i].promedio);
+}
+
+fclose(fp);
+return 1;
+}
+
+
+
+
+
+int leerArchivoEstudiantesTxtLongFija(const char *nombre, char* modo){
+
+t_estudiantes est;
+FILE *fp;
+fp = fopen(nombre, modo);
+if(!fp) return 0;
+rewind(fp);
+fscanf(fp,"%08ld%20[^\n]%20[^\n]%4f\n",&est.dni,est.apellido,est.nombre,&est.promedio);
+
+while(!feof(fp)){
+mostrarEstudianteAcotada(&est);
+fscanf(fp,"%08ld%20[^\n]%20[^\n]%4f\n",&est.dni,est.apellido,est.nombre,&est.promedio);
+
+
+}
+
+
+
+

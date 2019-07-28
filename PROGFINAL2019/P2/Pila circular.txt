@@ -1,0 +1,68 @@
+int pila_llena(const t_pila* pila)
+{
+    t_nodo *aux=(t_nodo*)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return 1;
+    free(aux);
+    return -1;
+        
+    
+}
+int pila_vacia(const t_pila* pila)
+{
+    if(*pila==NULL)
+    return 1;
+    return -1;
+}
+int poner_en_pila(t_pila* pila, int* d)
+{
+/*** en pila el ultimo esta despues del primero  por ejemplo si esta en orden   1-4-3-2*/
+
+    t_nodo *aux=(t_nodo *)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return -1;
+    aux->dato=*d;
+    if(*pila==NULL)
+    {
+        *pila=aux;
+        aux->sig=aux;
+    }
+    else
+    {
+        aux->sig=(*pila)->sig;
+        (*pila)->sig=aux;
+        
+    }
+    return 1;
+    
+}
+int sacar_de_pila(t_pila* pila, int* d)
+{
+    /*** en pila el ultimo esta despues del primero  por ejemplo si esta en orden   1-4-3-2*/
+    t_nodo *aux;
+    if(*pila==NULL)
+        return -1;
+    aux=(*pila)->sig;
+    *d=aux->dato;
+    (*pila)->sig=aux->sig;
+    free(aux);
+    return 1;
+}
+void vaciar_pila(t_pila* pila)
+{
+    t_nodo *aux,*aux2=*pila;
+    while((*pila)->sig!=aux2)
+    {
+        
+        aux=(*pila)->sig;
+        (*pila)->sig=aux->sig;
+        free(aux);
+    }
+    /*** en pila el ultimo esta despues del primero  por ejemplo si esta en orden   1-4-3-2*/
+    
+    aux2=(*pila)->sig;
+    (*pila)->sig=aux2->sig;
+    free(aux2);
+    
+    
+}

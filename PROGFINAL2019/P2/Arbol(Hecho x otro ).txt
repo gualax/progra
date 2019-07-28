@@ -1,0 +1,674 @@
+o por si alguno le falta alguna primitiva de arbol y tiene que recuperar el 2do parcial puede que algunas no esten del todo bien pero antes que nada (? 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>/** para hacer la funcion pow que es elevar un numero */
+#define DUPLICADO 2
+typedef struct /**un t_info cualquiera xd*/
+{
+    int legajo;
+    int dni;
+    char nomyape[20];
+    float altura;
+} t_info;
+typedef struct s_nodo
+{
+    t_info dato;
+    struct s_nodo *izq,*der;
+
+} t_nodo;
+
+typedef t_nodo *t_arbol;
+
+void crear_arbol(t_arbol * arbol);
+int insertar_en_arbol_recursivo(t_arbol *arbol,t_info *,int (*comparar)(int*,int*));
+int eliminar_nodo_donde_este2(t_arbol *,int dato_a_eliminar,int (*comparar)(int*,int*));/**intercambia contenidos no reemplza nodo y luego elimina sea padre o hoja o tenga un solo hijo**/
+int insertarArbol_iterativo(t_arbol*,t_info* d);
+int buscar_dato_por_diferente_orden_nombre(const t_arbol *arbol, t_info * dato_a_buscar,int (*comparar2)(char* a, char* b));/**busca por nomyape  y el dato ordenado por legajo*/
+/** por ejemplo ordenado por legajo y busca a marta y que dni=0 altura=0 entonces encuentra marta y llena los campos faltantes**/
+
+/*
+                       9
+                3              12
+            2       4      11        
+    y que el nodo 4  . nomyape == marta entonces completo los campos por ejemplo
+    la clave a buscar se la pasa por main
+*/
+int comparar(int*,int*);/**compara legajos*/
+int comparar2(char* a, char* b);/** compara nombres*/
+void recorrer_pre(t_arbol *arbol);
+void recorrer_orden(t_arbol *arbol);
+void recorrer_post(t_arbol *arbol);
+void vaciar_arbol(t_arbol *arbol);
+int esCompleto(const t_arbol*);/*** por definicion 2 a la altura -1 =  todo los nodos de arbol*/
+int esBalanceado(const t_arbol *);/*** por definicion 2 (a la altura-1) -1 =   tiene que ser completo al nivel anterior al maximo= contar nodos por nivel y nivel es la altura-1*/
+int EsAvl(t_arbol *);/** altura por izq   tiene como maximo de diferente a 1 con la altura der **/
+int buscar_nodo( t_arbol * arbol,t_info * clave, int (*comparar)( int *, int *));/**devuelve si lo encontro o no y completa los campos faltantes*/
+int  grabar_arbol_en_Archivo_en_orden(FILE *pf,t_arbol *arbol);/**recursivo*/
+
+t_nodo* buscar_nodo2( t_arbol * arbol,t_info * clave, int (*comparar)( int *, int *));/**devuelve puntero al nodo*/
+int  grabar_arbol_en_Archivo_en_pre(FILE *pf,t_arbol *arbol);
+int  grabar_arbol_en_Archivo_en_post(FILE *pf,t_arbol *arbol);
+int mostrararchivo(FILE *);
+
+
+
+int contarNodos(const t_arbol *arbol);
+int altura(const t_arbol *arbol);
+void podar_hojas_genera_nuevas_hojas(t_arbol *arbol);
+int contar_nodos_hasta_nivel(const t_arbol *,const int nivel);
+int contar_nodos_desde_nivel(const t_arbol *,const int nivel);
+void podar_desde_nivel(t_arbol *arbol,int nivel);
+int contar_hojas(const t_arbol *);
+int contar_hojas_de_un_nivel(const t_arbol *,const int nivel);
+void arbol_grafico(t_arbol *);
+
+t_info mayor_del_arbol(const t_arbol *arbol);
+t_info menor_del_arbol(const t_arbol *arbol);
+t_info* mayor_por_funcion_interna_devuelve_puntero_al_nodo( t_arbol *arbol);
+t_info* menor_por_funcion_interna_devuelve_puntero_al_nodo( t_arbol *arbol);
+t_nodo* buscar_mayor(t_arbol *arbol);
+t_nodo* buscar_menor(t_arbol *arbol);
+/**falta prototipo de balancear arbol :u*/
+void mostrararbol(t_arbol *arbol,int nivel);
+
+
+
+#include "tipos.h"
+#define TAM 15
+int main()
+{
+    t_info vec[TAM]=
+    {
+        {8,39766501,"nahuelvogel",1.71},
+        {4,123123,"juanbenitez",1.62},
+        {2,333222,"manuelobrador",1.56},
+        {1,555333,"nahueldominguez",1.32},
+        {3,144221,"marta",1.87},
+        {6,332211,"marta",1.78},
+        {5,653212,"miguel",1.92},
+        {7,123484,"rafa",1.65},
+        {12,994421,"marcelo",1.97},
+        {10,785321,"franco",1.54},
+        {9,1236662,"juan",1.58},
+        {11,533663,"fernando",1.68},
+       {14,1666222,"pablo",1.82},
+       {13,5533227,"florencia",1.65},
+        {15,78531234,"benjamin",1.43}
+    };
+    t_arbol arbol;
+    crear_arbol(&arbol);
+    int i;
+    for(i=0; i<TAM; i++)
+    insertar_en_arbol_recursivo(&arbol,&vec[i],comparar);
+    arbol_grafico(&arbol);
+    
+    printf("la altura es :%d\n",altura(&arbol));
+    printf("es avl:%d",esBalanceado(&arbol));
+    
+    
+    
+     /*   t_info dato;
+        strcpy(dato.nomyape,"marta");
+        if(buscar_dato_por_diferente_orden_nombre(&arbol,&dato,comparar2)>=1)
+        puts("\nlo encontro\n");
+    */
+    
+/*
+     puts("\n\n--------------------------------------------------------------------------------------------------");
+     int dato_a_eliminar=8;
+     eliminar_nodo_donde_este2(&arbol,dato_a_eliminar,comparar);
+     arbol_grafico(&arbol);
+         puts("\n\n------------------------------------------------------------------------------------------");
+      dato_a_eliminar=6;
+     eliminar_nodo_donde_este2(&arbol,dato_a_eliminar,comparar);
+     arbol_grafico(&arbol);
+              puts("\n\n------------------------------------------------------------------------------------------");
+
+      dato_a_eliminar=7;
+     eliminar_nodo_donde_este2(&arbol,dato_a_eliminar,comparar);
+     arbol_grafico(&arbol);
+   dato_a_eliminar=2;
+                 puts("\n\n------------------------------------------------------------------------------------------");
+
+     eliminar_nodo_donde_este2(&arbol,dato_a_eliminar,comparar);
+     arbol_grafico(&arbol);
+    /*
+       t_info *aux=mayor_por_funcion_interna_devuelve_puntero_al_nodo(&arbol);
+       printf("\n%d",aux->legajo);
+    */
+    
+  /*  int nivel=2;
+    printf("%d",contar_nodos_desde_nivel(&arbol,nivel));
+    */
+    
+    return 0;
+}
+
+
+
+
+t_nodo* buscar_nodo2( t_arbol * arbol,t_info * clave, int (*comparar)( int *, int *))/**devuelve puntero al nodo*/
+{
+    if(*arbol!=NULL)
+    {
+        while(*arbol!=NULL)
+        {
+            if( (comparar( &(*arbol)->dato.legajo,&clave->legajo) )<0 )
+            arbol=&(*arbol)->izq;
+            else if(  (comparar( &(*arbol)->dato.legajo,&clave->legajo) )>0  )
+            arbol=&(*arbol)->der;
+            else/* si es igual es el nodo buscado*/
+            {
+                return *arbol;
+            }
+        }
+    }
+    else
+    {
+        return NULL;
+    }
+return *arbol;
+}
+void arbol_grafico(t_arbol* arbol)
+{
+    int nivel=0;
+    mostrararbol(&(*arbol),nivel);/**mas facil pensarlo con variable nivel*/
+}
+/** EL ORDEN A RECORRER ES   DER  NODO  IZQ **/
+/**    POR CADA VES QUE ME VOY A LA DER AUMENTO EL NIVEL CON ESO SE LA CANTIDAD DE  espacios a la derecha que tengo que correr
+              **/
+/****     despues imprimo contenido como el orden es DER N IZQ  y por cada ves que imprimo un barra n     **/
+void mostrararbol(t_arbol *arbol,int nivel)
+{
+    int i;
+    if(*arbol!=NULL)
+    {
+        mostrararbol(&(*arbol)->der,nivel+1);
+        for(i=0;i<nivel;i++)
+         {
+             printf("\t");
+         }
+         printf("%d\n",(*arbol)->dato.legajo);/** el dato que quieras mostrar en este caso legajo*/
+        mostrararbol(&(*arbol)->izq,nivel+1);
+    }
+    return ;
+}
+int  grabar_arbol_en_Archivo_en_orden(FILE *pf,t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        t_info dato=(*arbol)->dato;
+        grabar_arbol_en_Archivo_en_orden(pf,&(*arbol)->izq);
+        fwrite(&dato,sizeof(t_info),1,pf);
+        grabar_arbol_en_Archivo_en_orden(pf,&(*arbol)->der);
+    }
+    else
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+int buscar_nodo( t_arbol * arbol,t_info * clave, int (*comparar)( int *, int *))/**devuelve si lo encontro o no y completa los campos faltantes*/
+{
+    if(*arbol!=NULL)
+    {
+
+       while(*arbol!=NULL)
+        {
+            if( (comparar( &(*arbol)->dato.legajo,&clave->legajo) )<0 )
+            arbol=&(*arbol)->izq;
+            else if(  (comparar( &(*arbol)->dato.legajo,&clave->legajo) )>0  )
+            arbol=&(*arbol)->der;
+            else/* si es igual es el nodo buscado*/
+            {
+            *clave=(*arbol)->dato;
+                return 1;/**ok*/
+            }
+        }
+        
+    }
+
+    return 0;
+}
+int saber_si_es_Avl(t_arbol *arbol)
+{
+     if(*arbol!=NULL&&abs((altura(&(*arbol)->izq))-(altura(&(*arbol)->der)))<=1)
+    return saber_si_es_Avl(&(*arbol)->izq)+saber_si_es_Avl(&(*arbol)->der)+1;
+    return 0;
+}
+int EsAvl(t_arbol *arbol)/** altura por izq   tiene como maximo de diferente a 1 con la altura der **/
+{
+    
+    if(*arbol!=NULL)
+    {   
+                
+       if((saber_si_es_Avl(&(*arbol)))==contarNodos(&(*arbol)))
+        return 1;
+    }
+    
+    
+    return 0;
+}
+int esBalanceado(const t_arbol *arbol)/*** por definicion 2 (a la altura-1) -1 =   tiene que ser completo al nivel anterior al maximo= contar nodos por nivel y nivel es la altura-1*/
+{
+    if(*arbol!=NULL)
+    {
+
+
+        if(      pow(2,altura(&(*arbol))-1)-1    == contar_nodos_hasta_nivel((&(*arbol)),altura(&(*arbol))-2   ))/** se le restan 2 porque como es nivel empieza en 0 y el otro porque la altura a mirar es una anterior al ultimo*/
+        {
+            return 1;/**todo ok*/
+        }
+
+
+    }
+    return 0;
+}
+int esCompleto(const t_arbol*arbol)/*** por definicion 2 a la altura -1 =  todo los nodos de arbol*/
+{
+    if(*arbol!=NULL)
+    {
+        if(  pow  (2,altura(&(*arbol)))-1 ==  contarNodos(&(*arbol)))
+            return 1;/** es completo*/
+    }
+    return 0;
+
+}
+int contar_hojas_de_un_nivel(const t_arbol *arbol,const int nivel)
+{
+    if(*arbol!=NULL)
+    {
+
+        if(nivel==0&&(*arbol)->izq==NULL&&(*arbol)->der==NULL)
+            return +1;
+        return contar_hojas_de_un_nivel(&(*arbol)->izq,nivel-1)+contar_hojas_de_un_nivel(&(*arbol)->der,nivel-1);
+    }
+    return 0;
+}
+
+int contar_hojas(const t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        if((*arbol)->izq==NULL&&(*arbol)->der==NULL)
+            return +1;
+        return contar_hojas(&(*arbol)->izq)+contar_hojas(&(*arbol)->der);
+    }
+    return 0;
+}
+
+
+t_nodo* buscar_menor(t_arbol *arbol)
+{
+    t_nodo *menor;
+    if((*arbol)->izq!=NULL)
+    {
+
+        return buscar_menor(&(*arbol)->izq);
+
+    }
+    else
+    {
+        menor=(*arbol);
+    }
+
+    return menor;
+}
+t_nodo* buscar_mayor(t_arbol *arbol)
+{
+    t_nodo *mayor;
+    if((*arbol)->der!=NULL)
+    {
+        return buscar_mayor(&(*arbol)->der);
+    }
+    else
+    {
+        mayor=(*arbol);
+    }
+    return mayor;
+}
+
+t_info * menor_por_funcion_interna_devuelve_puntero_al_nodo( t_arbol *arbol)
+{
+    t_nodo *menor=buscar_menor(arbol);
+    return &(menor)->dato;
+}
+
+t_info * mayor_por_funcion_interna_devuelve_puntero_al_nodo( t_arbol *arbol)
+{
+    t_nodo *mayor=buscar_mayor(arbol);
+    return &(mayor)->dato;
+}
+
+
+
+void podar_desde_nivel(t_arbol *arbol,int nivel)
+{
+
+    if(*arbol!=NULL)
+    {
+        podar_desde_nivel(&(*arbol)->izq,nivel-1);
+        podar_desde_nivel(&(*arbol)->der,nivel-1);
+        if(nivel<0)
+        {
+            free(*arbol);
+            *arbol=NULL;
+        }
+
+    }
+
+
+}
+
+int contar_nodos_desde_nivel(const t_arbol *arbol,const int nivel)
+{
+    int n=0;
+    if(*arbol!=NULL)
+    {
+
+        n+=contar_nodos_desde_nivel(&(*arbol)->izq,nivel-1);
+        n+=contar_nodos_desde_nivel(&(*arbol)->der,nivel-1);
+        if(nivel<0)
+        {
+            return n+1;
+        }
+
+    }
+    else
+    {
+        return 0;
+    }
+
+    return n;
+}
+
+
+int contar_nodos_hasta_nivel(const t_arbol* arbol, const int nivel)
+{
+    int n;
+    if(*arbol!=NULL)
+    {
+        n=contar_nodos_hasta_nivel(&(*arbol)->izq,nivel-1)+contar_nodos_hasta_nivel(&(*arbol)->der,nivel-1);
+        if(nivel>=0)
+        return n+1;
+    }
+    return 0;
+}
+void podar_hojas_genera_nuevas_hojas(t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        if((*arbol)->izq!=NULL&&(*arbol)->der!=NULL)
+        {
+            free(*arbol);
+            *arbol=NULL;
+        }
+        else
+        {
+            podar_hojas_genera_nuevas_hojas(&(*arbol)->izq);
+            podar_hojas_genera_nuevas_hojas(&(*arbol)->der);
+        }
+
+    }
+
+
+}
+
+
+
+t_info menor_del_arbol(const t_arbol* arbol)
+{
+    t_info menor;
+    if((*arbol)->izq!=NULL)
+    {
+
+        return menor_del_arbol(&(*arbol)->izq);
+
+    }
+    else
+    {
+        menor=(*arbol)->dato;
+    }
+
+    return menor;
+
+}
+t_info mayor_del_arbol(const t_arbol *arbol)
+{
+    t_info mayor;
+    if((*arbol)->der!=NULL)
+    {
+
+        return mayor_del_arbol(&(*arbol)->der);
+
+    }
+    else
+    {
+        mayor=(*arbol)->dato;
+    }
+
+    return mayor;
+}
+
+
+
+int contarNodos(const t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        return contarNodos(&(*arbol)->izq)+contarNodos(&(*arbol)->der)+1;
+    }
+    return 0;
+}
+int altura(const t_arbol *arbol)
+{
+    int hi,hd;
+    if(*arbol!=NULL)
+    {
+        hi=altura(&(*arbol)->izq);
+        hd=altura(&(*arbol)->der);
+        return hi>hd?hi+1:hd+1;
+    }
+
+    return 0;
+}
+
+int comparar2(char* a, char* b)
+{
+    return strcmp(a,b);
+}
+
+
+int buscar_dato_por_diferente_orden_nombre(const t_arbol *arbol, t_info * dato_a_buscar,int (*comparar2)(char* a, char* b))/**busca por nomyape  y el dato ordenado por legajo*/
+{
+    if(*arbol!=NULL)
+    {
+        if((comparar2((*arbol)->dato.nomyape,dato_a_buscar->nomyape))==0)
+        {
+            *dato_a_buscar=(*arbol)->dato;/**si el dato a buscar tiene basura en los demas campos le cargo los datos restantes*/
+            /** por ejemplo buscar marta pero legajo =0  dni =0 altura =0 y le cargo sus datos correspondientes**/
+            return 1;
+        }
+
+        else
+        {
+            return buscar_dato_por_diferente_orden_nombre(&(*arbol)->izq,dato_a_buscar,comparar2)+buscar_dato_por_diferente_orden_nombre(&(*arbol)->der,dato_a_buscar,comparar2);
+        }
+
+    }
+
+    return 0;
+
+
+}
+
+
+int comparar(int* a,int *b)
+{
+    return *a-*b;
+}
+
+t_info  buscar_candidato_por_derecha2(t_arbol *arbol)
+{
+    t_nodo *aux;
+    t_info dato;
+    if((*arbol)->der!=NULL)
+        return buscar_candidato_por_derecha2(&(*arbol)->der);
+    else
+    {
+        aux=(*arbol)->izq;/** si tiene null es hoja*/
+        dato=(*arbol)->dato;
+        free(*arbol);
+        *arbol=aux;
+        return dato;
+    }
+    return dato;
+
+}
+
+t_info  buscar_candidato_por_izq2(t_arbol *arbol)
+{
+    t_nodo *aux;
+    t_info dato;
+    if((*arbol)->izq!=NULL)
+        return  buscar_candidato_por_izq2(&(*arbol)->izq);
+    else
+    {
+        aux=(*arbol)->der;/** si tiene null es hoja*/
+        dato=(*arbol)->dato;
+        free(*arbol);
+        *arbol=aux;
+        return dato;
+    }
+    return dato;
+}
+
+int eliminar_nodo_donde_este2(t_arbol * arbol,int dato_a_eliminar,int (*comparar)(int*,int*))
+{
+    t_info aux;
+    if(*arbol==NULL)
+        return 0;
+    if((comparar(&(*arbol)->dato.legajo,&dato_a_eliminar))==0)
+    {
+        if((*arbol)->izq!=NULL||(*arbol)->der!=NULL)
+        {
+            if(altura(&(*arbol)->izq)>=altura(&(*arbol)->der))
+                aux=buscar_candidato_por_derecha2(&(*arbol)->izq);
+            else
+                aux=buscar_candidato_por_izq2(&(*arbol)->der);
+            (*arbol)->dato=aux;/**reemplazo candidato**/
+            return 1;
+        }
+        else
+        {
+            free(*arbol);
+            *arbol=NULL;
+            return 1;
+        }
+    }
+    eliminar_nodo_donde_este2(&(*arbol)->izq,dato_a_eliminar,comparar);
+    eliminar_nodo_donde_este2(&(*arbol)->der,dato_a_eliminar,comparar);
+
+    return 0;
+}
+
+
+void crear_arbol(t_arbol* p)
+{
+    *p=NULL;
+}
+int insertar_en_arbol_recursivo(t_arbol *arbol,t_info * d,int (*comparar)(int*,int*))
+{
+    if( *arbol!=NULL)
+    {
+        if((comparar(&(d)->legajo,&(*arbol)->dato.legajo))<0)
+            return insertar_en_arbol_recursivo(&(*arbol)->izq,d,comparar);
+        else
+        {
+            return insertar_en_arbol_recursivo(&(*arbol)->der,d,comparar);
+        }
+    }
+    else
+    {
+        t_nodo * aux=(t_nodo*)malloc(sizeof(t_nodo));
+        if(aux==NULL)
+            return -1;
+        aux->dato=*d;
+        aux->izq=NULL;
+        aux->der=NULL;
+        *arbol=aux;
+    }
+
+    return 1;
+}
+void recorrer_pre(t_arbol* arbol)/** en pre */
+{
+    if(*arbol!=NULL)
+    {
+        printf("%d\n",(*arbol)->dato.legajo);
+        recorrer_pre(&(*arbol)->izq);
+        recorrer_pre(&(*arbol)->der);
+    }
+    return ;
+}
+void recorrer_orden(t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        recorrer_pre(&(*arbol)->izq);
+        printf("%d\n",(*arbol)->dato.legajo);
+        recorrer_pre(&(*arbol)->der);
+    }
+    return ;
+}
+void recorrer_post(t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        recorrer_pre(&(*arbol)->izq);
+        recorrer_pre(&(*arbol)->der);
+        printf("%d\n",(*arbol)->dato.legajo);
+    }
+    return ;
+}
+void vaciar_arbol(t_arbol *arbol)
+{
+    if(*arbol!=NULL)
+    {
+        vaciar_arbol(&(*arbol)->izq);
+        vaciar_arbol(&(*arbol)->der);
+    }
+    free(*arbol);
+    *arbol=NULL;
+}
+int insertarArbol_iterativo(t_arbol* arbol,t_info* d)
+{
+    while((*arbol)!=NULL)
+    {
+
+
+        if((*arbol)->dato.legajo>(d)->legajo)
+            arbol=&(*arbol)->izq;
+        else if((*arbol)->dato.legajo<(d)->legajo)
+            arbol=&(*arbol)->der;
+        else
+            return DUPLICADO;
+    }
+
+
+    t_nodo *aux=(t_nodo*)malloc(sizeof(t_nodo));
+    if(aux==NULL)
+        return -1;
+
+    aux->der=NULL;
+    aux->izq=NULL;
+    aux->dato=*d;
+    *arbol=aux;
+    return 1;
+
+}

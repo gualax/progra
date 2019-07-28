@@ -1,0 +1,189 @@
+void crearListaD(tListaD *pl)
+{
+    *pl = NULL;
+}
+
+
+int listaDvacia(tListaD *pl)
+{
+    return *pl == NULL;
+}
+/*
+int listaDLlena(tListaD *pl)
+{
+    tNodoLD *aux;
+
+    aux = (tNodoLD *)malloc(sizeof(tNodoLD));
+
+    if(!aux) return 0; // no tinene espacio
+
+
+    free(aux);
+
+}
+*/
+
+int insertarEnOrdenListaD(tListaD *pl, tInfo *d, int (* comparar)(tInfo *, tInfo *))
+{
+        // creo los punteros que necesito
+    tNodoLD *nue, *ant, *act;
+        //igualo el puntero a act para trabajar
+    act = *pl;
+        // pregunto por la nulidad de act para saber que poner en ant
+    if(act)
+    {
+        ant= act->ant;
+    }else
+    {
+        ant = NULL;
+    }
+        // reviso comparando por izquierda y corro los punteros
+    while(ant && comparar(&(ant)->info, d)>0)
+    {
+        act = ant;          // me corro para la izquierda
+        ant = act->ant;
+    }
+
+        //reviso comparando por derecha y corro los punteros
+    while(act && comparar(&(act)->info,d) < 0)
+    {
+        ant = act;
+        act = ant->sig;
+    }
+        // si son iguales entonces retorno duplicado
+    if((act && comparar(&(act)->info,d) == 0) || (ant && comparar(&(ant)->info, d) ==  0) )
+    {
+        return 0; //Clave duplicada
+    }else{
+
+    nue = (tNodoLD *)malloc(sizeof(tNodoLD));  // reservo memeoria
+
+    if(!nue) return 0; //  no hay memoria
+    }
+    // cuando ya me posicione entonces ahi cargo a nue con la info necesaria  y enlazo el nuevo
+    nue->info = *d;
+    nue->sig = act;
+    nue->ant = ant;
+    *pl = nue;
+
+    // luego enlazo la lista al nuevo
+    if(act)
+    {
+        act->ant = nue;
+    }
+
+    if(ant)
+    {
+        ant->sig = nue;
+    }
+
+    return 1; // todo bien
+}
+
+
+
+
+int vaciarListaD(tListaD *pl)
+{
+tNodoLD *act;
+
+act = *pl;
+
+if(!act) return 0; // lista vacia
+
+// voy al principio de la lista por que no se dnde estoy parado
+    while(act->ant)
+    {
+        act = act->ant;
+    }
+// ahora recorro para adelante
+    while(act)
+    {
+        free(act);
+        act = act->sig; //  ver si no va  arriba
+
+    }
+    *pl = NULL;
+}
+
+
+void mostrarListaD(tListaD *pl)
+{
+
+tNodoLD *act;
+act = *pl;
+
+if(!act) return ; //lista  vacia
+//primero voy para el principio de la  lista(Atras)
+while(act->ant)
+{
+    act = act->ant;
+}
+
+while(act)
+{
+    mostrarPersona(&(act)->info);
+    act= act->sig;
+}
+
+
+}
+
+int compararXnroReg(tInfo *a, int b)
+{
+
+    return a->nroReg - b;
+}
+
+int eliminarUnElementoDeLaLista(tListaD *pl, int elem, int (* compararXnroReg)(tInfo *, int))
+{
+
+tNodoLD *act;
+
+act = *pl;
+
+// voy al comienzo de la lista
+
+while(act->ant)
+{
+    act = act->ant;
+}
+
+// ahora recorro y comparo desde el principio
+
+while(act)
+{
+
+    if(compararXnroReg(&(act)->info,elem) == 0)
+{
+
+    // me fijo si la lista no apunta a ese lemeento
+    if(act == *pl)
+    {
+        if(act->ant)
+        {
+           *pl = act->ant;
+        }else{
+
+            *pl = act->sig;
+        }
+
+            if(act->ant) // si tiene anterior tengo q reenlazar
+            {
+                act->ant->sig = act->sig;
+            }
+            if(act->sig) // si tiene siguiente tengo que reenlazar
+            {
+                act->sig->ant = act->ant;
+            }
+            free(act);  // libero
+            return 1;
+    }
+}else{
+    printf("no lo  encontre");
+    act = act ->sig;
+}
+}
+
+return 1;
+}

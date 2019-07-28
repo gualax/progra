@@ -1,0 +1,173 @@
+//////////////// CADENAS.H /////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+
+class Cadenas{
+
+
+private:
+
+    char *cad;
+
+public:
+
+
+    Cadenas(char * = "");
+    Cadenas(const Cadenas &); //constructor de copia
+    Cadenas & operator =(const char *);
+    Cadenas& operator =(const Cadenas &);
+    Cadenas  operator +(const Cadenas &) const;
+    Cadenas  operator +(const char *) const;
+bool operator==(const Cadenas &)const;
+ friend ostream & operator <<(ostream &,const  Cadenas &);
+ friend istream & operator >>(istream &, Cadenas &);
+
+friend Cadenas operator+(char * , const Cadenas &);
+
+~Cadenas(); // destructor
+   void mostrar();
+
+
+};
+
+
+//////////////// CADENAS.c /////////////////////////////////////////////////////////
+
+
+Cadenas :: Cadenas (char * c)
+{
+
+if(!*c)         // si es nulo lo pongo con \0
+{
+     cad = new char;
+    *cad ='\0';
+}else{
+    cad = new char[strlen(c)+1];
+    strcpy(cad, c);
+}
+};
+
+/*
+Inicializador esto va vacio  y en el inicializador va = "" en vez de NULL
+Cadenas :: Cadenas (char * c): cad(c)
+{
+};
+*/
+Cadenas  :: Cadenas(const Cadenas &obj) //  Constructor de copia
+{
+
+cad = new char[strlen(obj.cad)+1];        // tengo que reservar el espacio de la cadena del objeto
+
+    strcpy(cad,obj.cad);                // tengo que copiarlo dentro de la cadena que reserve el espacio
+
+};
+
+Cadenas & Cadenas :: operator =(const char *c)
+{
+
+    delete[]cad;
+
+    cad = new char[strlen(c) +1];
+
+    strcpy(cad, c);
+
+};
+
+Cadenas & Cadenas :: operator =(const Cadenas &obj)
+{
+    delete[]cad;
+
+    cad = new char[strlen(obj.cad)+1];
+
+    strcpy(cad, obj.cad);
+
+    return *this;
+};
+
+
+Cadenas  Cadenas :: operator +(const Cadenas &obj) const
+{
+    Cadenas aux;  // creo un nuevo objeto por que no quiero modificar el llamador (c1 + c2) c1 seria el llamador
+
+    aux.cad = new char[strlen(cad) + strlen(obj.cad) +1]; // creo espacio para guardar lo que tengo mas lo que me va a venir
+
+    strcpy(aux.cad, cad);                   // copio en la nueva cadena lo que tengo
+    strcat(aux.cad, obj.cad);               // y le agrego lo que me va a venir y lo devuelvo
+
+    return aux;
+};
+
+
+Cadenas  Cadenas :: operator +(const char *c) const
+{
+    Cadenas aux;  // creo un nuevo objeto por que no quiero modificar el llamador (c1 + c2) c1 seria el llamador
+
+    aux.cad = new char[strlen(cad) + strlen(c) +1]; // creo espacio para guardar lo que tengo mas lo que me va a venir
+
+    strcpy(aux.cad, cad);                   // copio en la nueva cadena lo que tengo
+    strcat(aux.cad, c);               // y le agrego lo que me va a venir y lo devuelvo
+
+    return aux;
+};
+
+
+ostream & operator <<(ostream &salida,const  Cadenas &obj)
+{
+
+    salida << obj.cad;
+    return salida;
+};
+
+
+istream & operator >>(istream &input, Cadenas &obj)
+{
+
+    char linea[200];                    // se usa para el getline para que tome los espacios cuando escribis
+
+    cout << "Ingresar texto"<<endl;
+    input.getline(linea,sizeof(linea));                       // en cin recibo el primitivo y despues lo guardo en la varible del 0bj
+    delete[]obj.cad;
+    obj.cad  = new char[strlen(linea)+1];
+    strcpy(obj.cad, linea);
+    return input;
+
+};
+
+ Cadenas operator+(char *c , const Cadenas &obj)
+ {
+   Cadenas aux;
+
+   aux.cad = new char[strlen(c) + strlen(obj.cad) +1];
+
+   strcpy(aux.cad, c);
+   strcat(aux.cad, obj.cad);
+
+   return aux;
+
+
+ };
+
+void Cadenas :: mostrar(){
+
+cout << cad <<  endl;
+
+};
+
+bool Cadenas :: operator==(const Cadenas &obj)const
+{
+
+    return strcmp(cad,obj.cad);
+
+}
+
+
+
+// destructor
+Cadenas ::  ~Cadenas()
+{
+    delete[]cad;
+}

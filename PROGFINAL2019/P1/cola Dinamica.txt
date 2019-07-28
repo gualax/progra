@@ -1,0 +1,140 @@
+
+/*
+/// COLA DINAMICA /////////////////////////////////////
+
+typedef int tInfoD;
+
+typedef struct sNodo
+{
+    tInfoD info;
+
+    struct sNodo *sig;
+
+}tNodo;
+
+
+typedef struct
+{
+    tNodo *pri,
+          *ult;
+}tColaD;
+
+*/
+
+//// Cola dinamica ///////////////////////////////////////////////////////////
+// la cola dinamica siempre queda apuntando al primero ya que es el proximo que sale primero que entra primero que sale
+// |__|->  |__|->  |__|->
+// ult              pri
+
+
+
+
+int crearCola_D(tColaD *p)
+{
+    p->pri = NULL;
+    p->ult = NULL;
+
+}
+
+int colaVacia_D(tColaD *p)
+{
+    return p->pri == NULL;
+}
+
+
+int colaLlena_D(tColaD *p)
+{
+    tNodo *nue;         // creo un nuevo nodo
+
+    nue = (tNodo *)malloc(sizeof(tNodo));     // reservo memoria para ese nodo
+
+    if(nue == NULL ) return 0;              // me aseguro que haya memoria
+
+    free(nue);                              // si hay libero
+
+    return 1;
+
+}
+
+
+
+int encolar_D(tColaD *p, tInfoD *d)
+{
+    tNodo *nue;                                // creo un nuevo nodo
+
+    nue = (tNodo *)malloc(sizeof(tNodo));       // reservo memoria para el nuevo nodo
+
+    if (!nue) return 0;        // pregunto si no es igual a null
+
+    nue->info = *d;             // coloco la info en el nuevo nodo
+    nue->sig = NULL;
+
+    if(p->pri == NULL)           //me fijo que si esta vacia osea que  sea el primer elemento
+    {
+        p->pri = nue;
+        p->ult = nue;
+    }else{                      // si no es el primer elemento
+
+        p->ult->sig = nue;
+        p->ult = nue;
+    }
+        return 1;
+}
+
+
+int desencolar_D(tColaD *p, tInfoD *d)
+{
+
+    if(p->pri == NULL) return 0;
+
+    tNodo *aux;
+
+
+    aux = p->pri;    // coloco lo del primer elemento en aux
+    *d= aux->info;  // luego la info de aux la coloco en el dato
+
+    p->pri = aux->sig;  // y hago que el primero en cola apunte al siguiente de aux
+
+
+    free(aux); // libero aux
+
+    if(p->pri == NULL)  // me fijo si quedo vacia
+    {
+        p->ult = NULL;      // si esta vacia el ultimo debe apuntar a null
+    }
+
+    return 1;
+
+
+}
+
+int verPrimeroEnCola_D(tColaD *p, tInfoD *d)
+{
+    if(p->pri == NULL) return 0;
+
+    *d = p->pri->info;
+
+    return 1;
+}
+
+
+int vaciarCola_D(tColaD *p)
+{
+    tNodo *aux;
+
+    aux = (tNodo *)malloc(sizeof(tNodo));
+
+    if(aux == NULL) return 0; // no se pudo reservar memoria
+
+    while(p->pri) // mietras en pri haya algo
+    {
+
+        aux = p->pri;
+        p->pri = aux->sig;
+
+        free(aux);
+
+    }
+    p->ult = NULL;  // una  vez termino pongo el ultimo en null
+
+}

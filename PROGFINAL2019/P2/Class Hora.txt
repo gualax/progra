@@ -1,0 +1,138 @@
+
+///// HORA.h /////////////////////////////////////////////////////////////////////////////
+
+class Hora{
+private:
+    int seg;
+    void ajusta();
+
+public:
+    Hora();
+    Hora(int , int , int );
+
+    Hora suma(const Hora &)const;
+    Hora operator+(const Hora &) const;//el q esta a a izquierda es el objeto llamador
+    Hora operator+(int )const;
+    Hora & operator+=(const Hora &); // & por el igual devuelvo referencia
+    Hora & operator+=(int);
+    friend istream &operator>>(istream &,Hora  &);
+    friend ostream & operator<<(ostream &, const Hora &);
+
+    friend Hora operator+(const Hora &, int ); // h3 = 3 + h2
+    bool operator>=(const Hora &) const;
+    bool operator<(const Hora  &) const;
+    Hora operator++(int ); //  (pos incremento) //se  pone int para diferenciarlo del pre incremental
+
+    //Funcion estatica
+    static Hora getHoraMaxima();
+
+};
+
+
+///// HORA.c /////////////////////////////////////////////////////////////////////////////
+
+
+Hora :: Hora(){
+    this->seg = 0;
+}
+
+
+Hora :: Hora(int h, int m, int s){
+
+ //this->seg = h * 3600 + m + s; // pessola
+  seg = s + m*60 + h *3600; // el peladito
+  ajusta();// o this->ajusta()
+}
+
+
+
+// si pasa de 86400 seg (1 dia) debo resetaear
+void Hora::ajusta(){
+while (seg>=86400)
+    seg -=86400;
+}
+
+
+// ingreso por pantalla
+istream & operator>>(istream & in, Hora &obj){
+int h, m, s;
+
+cout<< "Hora";
+    in>>h;
+cout<<"Min";
+    in>>m;
+cout<<"Seg";
+    in>>s;
+    obj.seg = s + m*60 + h*3600;
+    obj.ajusta();
+    return in;
+}
+
+
+ostream & operator<<(ostream &out, const Hora &obj)
+{
+
+out<<obj.seg;
+return out;
+
+}
+
+// comparacion
+bool Hora::operator>=(Hora & obj)const {
+    return seg >= obj.seg:
+}
+
+bool Hora::operator<(Hora & obj) const {
+    return seg < obj.seg:
+}
+
+Hora Hora ::operator++(int){
+    Hora aux(*this); //le digo que sea igual al seg global
+    this->seg ++; // aumento el goblal
+    this->ajusta();
+    return aux;  //devuelvo
+}
+
+// h3 = h2.suma(h1);
+// devuelvo la hora sumada de h2 y h1
+Hora Hora :: suma(const Hora &obj) const{
+
+    Hora aux = (0,0,this->seg + obj.seg);
+    return aux;
+
+}
+
+
+// h3 = h2 + 5 ;
+// devuelvo la hora sumada de h2 y 5
+
+Hora Hora ::operator+(const Hora &obj) const{
+
+    Hora aux;
+    aux.seg = seg + obj.seg;
+    aux.ajusta();
+    return aux;
+}
+
+Hora & Hora ::operator+=(const Hora &obj){
+this->seg+=obj.seg;
+return *this; //devuelve el objeto llamador
+
+}
+
+Hora &  Hora::operator+=(int  num){
+seg += num;
+ajusta();
+return *this;
+}
+
+Hora operator+(const Hora &obj, int num)
+{
+    //Hora aux(obj);
+    return Hora(0,0,obj.seg + num);
+
+}
+
+static Hora Hora::getHoraMaxima(){
+    return Hora (23,59,59);
+}

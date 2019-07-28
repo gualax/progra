@@ -1,0 +1,770 @@
+/*
+    Arbol
+    El arbol esta compuesto por |izq|dato|der| la regla de formacion es que si es el dato es menor va por el izquierdo y si es mayor por el derecho
+
+
+*/
+
+///Creacion del arbol
+void crearArbol(tArbol *pa)
+{
+    *pa = NULL;
+
+}
+
+///Funcion de comparacion
+int comparacion(tInfo *a, tInfo *b)
+{
+    return *a - *b;
+}
+
+
+/// Coloca la informacion en el arbol segun el criterio izq < info < der
+int ponerEnArbol(tArbol *pa, tInfo *d,int (* comparacion)(const tInfo *, const tInfo *))
+{
+
+    int compara;
+
+
+    if(!*pa)   //si no es null
+    {
+
+        *pa=(tNodo *)malloc(sizeof(tNodo));
+
+        if(!pa) return 0;
+
+        (*pa)->info = *d;
+        (*pa)->izq = NULL;
+        (*pa)->der = NULL;      // como es recursiva se asegura de que llego a una hoja y coloco lo siguiente en null
+      //  printf("\n dentro del if");
+        return 1;
+    }
+    //printf("\n desp del if");
+    compara = comparacion(&(*pa)->info,d); // compara y devulve el resultado
+
+    if(compara == 0) return 0;     //  duplicados no coloca nada
+
+    if(compara > 0){
+        return ponerEnArbol(&(*pa)->izq,d,comparacion);
+    }else{
+        return ponerEnArbol(&(*pa)->der,d,comparacion);
+    }
+}
+
+/// Muestra la info del nodo
+void visitar(const tInfo *d)
+{
+    printf("\n %d",d);
+}
+
+
+
+void arbol_grafico(const t_arbol *pa,void (*mostrar_clave)(const t_info *))
+{
+    arbol_grafico_int(pa,mostrar_clave,0);
+}
+
+void arbol_grafico_int(const t_arbol *pa,void(*mostrar_clave)(const t_info *),int n)
+{
+    int i;
+    if(!*pa)
+        return;
+    arbol_grafico_int(&(*pa)->pder,mostrar_clave,n+1);
+    for(i=0;i<n;i++)
+    {
+        printf("\t");
+    }
+    mostrar_clave(&(*pa)->info);
+    printf("\n");
+
+    arbol_grafico_int(&(*pa)->pizq,mostrar_clave,n+1);
+
+}
+
+
+
+///Recorre y muestra en pre orden IDN
+// en orden    I N D  (izquierda nodo derecha)
+void mostrarEnOrden(const tArbol *pa, void(* visitar)(const tInfo *d))
+{
+    if(!*pa) return 0;
+
+    mostrarEnOrden(&(*pa)->izq,visitar);  // recorre izquierda
+
+    visitar((*pa)->info);                  // va al  nodo raiz
+
+    mostrarEnOrden(&(*pa)->der, visitar);   // recorre  derecha
+
+}
+
+
+
+///Recorre y muestra en pre orden NID
+//  en Pre orden N I D
+void mostrarEnPreOrden(const tArbol *pa, void (* visitar)(const tInfo *d))
+{
+    if(!*pa) return 0;
+
+    visitar((*pa)->info);;
+
+    mostrarEnPreOrden(&(*pa)->izq, visitar);
+
+    mostrarEnPreOrden(&(*pa)->der,visitar);
+
+}
+///Recorre y muestra en post orden IDN
+//  en Post orden  I D N
+void mostrarEnPostOrden(const tArbol *pa, void (* visitar)(const tInfo *d))
+{
+    if(!*pa) return 0;
+
+    mostrarEnPostOrden(&(*pa)->izq, visitar);
+
+    mostrarEnPostOrden(&(*pa)->der,visitar);
+
+    visitar((*pa)->info);
+}
+
+
+
+// requiere que mayor tenga algo para poder comparar
+void mayor_info_arbol(const t_arbol* pa,t_info *mayor ,int (*cmp)(const t_info*, const t_info*))
+{
+    if(!*pa)
+            return;
+    mayor_info_arbol(&(*pa)->pizq,mayor,cmp);  // me tengo que ir al de mas a la izquierda por que no estan ordenados por promedio esta ordenado x dni
+
+    if(cmp(&(*pa)->info,mayor) > 0)
+    {
+        *mayor = (*pa)->info;
+    }
+
+    mayor_info_arbol(&(*pa)->pder,mayor,cmp);
+}
+
+
+
+// es arbol avl si si la diferencia de altura entre izq y der es <=1
+int es_arbol_avl(const t_arbol* pa){
+int hi, hd;
+if(!*pa) return;
+hi = altura_arbol(&(*pa)->pizq);
+hd = altura_arbol(&(*pa)->pder);
+
+if(abs(hi-hd)<=1){
+    return 1;
+}
+return 0;
+
+}
+
+
+
+int es_arbol_avl(const t_arbol* pa)
+{
+    int hi, hd;
+    if(!*pa)
+        return 0;
+    hi = altura_arbol(&(*pa)->pizq);
+    hd = altura_arbol(&(*pa)->pder);
+    if(abs(hi-hd) <= 1)
+    	return es_arbol_avl(&(*pa)->pizq) && es_arbol_avl(&(*pa)->pder);
+     return 0;	
+}
+
+///  Vacia todo el arbol dejandolo como se creo
+//voy recorriendo el arbol por ambas ramas y liberando el espacio que recorri
+void vaciarArbolEntero(tArbol *pa)
+{
+    if(*pa)                             ///Pregunto si existe
+    {
+        vaciarArbolEntero(&(*pa)->izq);     // recorro por izquierda  recursivamente
+
+        vaciarArbolEntero(&(*pa)->der);     // recorro por derecha recursivamente
+
+        free(*pa);                          // voy liberando
+
+        *pa=NULL;                           // al fininal coloco el arbol en NULL como si recien estuviera creado.
+    }
+}
+
+///Poda el arbol desde cierto nivel hacia abajo
+//voy recorriendo y decrementando el nivel y cuando el nivel llega a la condicion niv == 0  entoces a partir de ahi elimino  todo
+void podarArbolxNivel(tArbol *pa, int nivel)
+{
+    if(*pa)                             // me fijo que el arbol exista
+    {
+        if(nivel == 0)                  // si el nivel es igual a 0 entonces elimino todo de ahi para abajo
+        {
+            vaciarArbolEntero(pa);          //utilizo la funcion de vaciar arbol para eliminar
+        }else{
+            podarArbolxNivel(&(*pa)->izq,nivel - 1);       // voy recorriendo el arbol recursivamente y bajando el nivel
+            podarArbolxNivel(&(*pa)->der,nivel - 1);       // voy recorriendo el arbol recursivamente y bajando el nivel
+        }
+    }else{
+        return;
+    }
+}
+
+///Cuenta la cantidad de nodos de todo el arbol
+// Para contar nodos llamo recursivamente a la funcion con su return + 1, esto hara que cada que vez que se llame
+// a la funcion esta retorne 1 + lo que tenia el return anterior y asi sucesivamente se van acumulando.
+size_t contarNodos(tArbol *pa)
+{
+if(*pa)                     //si existe el arbol recorro
+{
+    return contarNodos(&(*pa)->izq) + contarNodos(&(*pa)->der) + 1; // recorro ambas ramas y devuelvo uno por cada vez que recorri
+}                                                                   // esto se va acumulando y es lo que se dvuelve
+
+return 0;                   //si no existe devuelvo 0
+
+}
+
+
+///Contar nodos x nivel, cuenta la cantidad de nodos Ya sean hojas o no, dependera del nivel
+//
+size_t contarNodosXnivel(tArbol *pa, int nivel)
+{
+if(*pa && nivel>0)                     //si existe el arbol y el nivel es mayor a 0 sigo recorriendo y contantod
+{
+    nivel --;
+    return contarNodosXnivel(&(*pa)->izq,nivel) + contarNodosXnivel(&(*pa)->der, nivel) + 1; // recorro ambas ramas y devuelvo uno por cada vez que recorri
+}                                                                   // esto se va acumulando y es lo que se dvuelve
+
+return 0;                   //si no existe devuelvo 0
+
+}
+
+/// cuenta las hojas del  arbol
+// si el nodo tiene izq y der en null entonces ese nodo es una hoja por lo tanto si encuentro eso retorno 1 y si no sigo recorriendo al final
+// el return de 1 se ira acumulando y sera lo que se devolvera
+size_t contarHojas(tArbol *pa)
+{
+   if(*pa)
+    {
+        if((*pa)->izq == NULL && (*pa)->der == NULL )
+        {
+            return 1;
+        }else{
+
+            return contarHojas(&(*pa)->izq) + contarHojas(&(*pa)->der);
+        }
+    }
+    return 0;
+}
+
+/// Cuenta la altura del arbol, la altura es la cantidad de veces que tengo que iterar hasta llegar a la hoja de maximo nivel
+// como la hoja de maximo nivel puede estar en cualquier rama tengo que evaluar la rama mayor, cuando desapila de memoria el + 1  se va acumulando.
+size_t altura(tArbol *pa)
+{
+    size_t hi, hd;
+
+    if(*pa)
+    {
+        hi = altura(&(*pa)->izq);           //Aca se da la recurisvidad
+        hd = altura(&(*pa)->der);
+
+        if(hi>hd)                           // devuelvo el valor de la rama mas grande
+        {
+            return hi + 1;
+        }else{
+            return hd + 1;
+        }
+    }
+    return 0;
+}
+
+/// un arbol es completo cuando tiene nodos hasta el nivel dado
+//Dado el nivel voy llamando recursivamente al funcion decrementando el nivel
+int esCompleto_hasta_nivel(tArbol *pa, int nivel)
+{
+    if(!*pa) return nivel < 0;
+    return esCompleto_hasta_nivel(&(*pa)->izq, nivel -1) && esCompleto_hasta_nivel(&(*pa)->der, nivel -1); // esto se da si tiene este nodo tiene 2 hojas
+}
+
+/// arbol completo indica si el arbol entero es completo
+//  para ello hay que usar a la funcion de altura poner el resultado en una variable y desp usar la funcion esCompleto pasandole como nivel la altura.
+//es completo si tiene todos los nodos a altura -1
+int arbolCompleto(tArbol *pa)
+{
+    size_t h = altura(pa);
+    return esCompleto_hasta_nivel(pa,h-1);
+}
+
+
+/// balanceado es cuando es completo a el nivel menos  1
+
+int esBalanceado_hasta_nivel(tArbol *pa, int nivel)
+{
+    if(!*pa) return nivel < 1;
+    return esBalanceado_hasta_nivel(&(*pa)->izq, nivel -1) && esBalanceado_hasta_nivel(&(*pa)->der, nivel -1);
+}
+
+
+/// balanceado es cuando es completo a altura - 2
+
+int esArbolBalanceado(t_arbol *pa){
+	int h = altura_arbol(pa);
+	return esCompleto_hasta_nivel(pa,h-2);
+
+}
+
+
+int cargarArchivoOrdEnArbol(tArbol *pa, FILE *fp)
+{
+    int cantBytes;
+    int cantRegs;
+
+    fp = fopen("archivoBinOrd.dat","rb");
+    rewind(fp);
+
+    fseek(fp,0,SEEK_END);
+
+    cantBytes = ftell(fp);
+
+    cantRegs = cantBytes / sizeof(tInfo);
+
+
+    if(insertarArchivoOrdenadOEnArbol(pa,fp,0,cantRegs-1)!= cantRegs)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+int insertarArchivoOrdenadOEnArbol(tArbol *pa, FILE *fp, int LI, int LS)
+{
+    tInfo datos;
+    int mitad;
+
+    mitad = (LI + LS) /2;
+    // me tengo q parar en la mitad
+
+    fseek(fp,mitad * sizeof(tInfo),SEEK_SET);
+
+    fread(&datos,sizeof(tInfo),1,fp);
+
+    if(!insertarEnArbol(pa,&datos,comparar))
+    {
+        return 0;
+    }
+
+    if(LI<LS)
+    {
+      return  insertarArchivoOrdenadOEnArbol(pa,fp,LI,mitad -1)
+                + insertarArchivoOrdenadOEnArbol(pa,fp,mitad  + 1,LS);
+    }
+    return 1;
+
+}
+
+
+
+
+// LI - Ls izquierda
+// Li + Ls derecha
+//Si lo hago como en preOrden me queda como una lista, asi que hay que hacerlo diferente
+// me tengo  que parar al medio de los datos (promedio, dato medio) y cargar para un lado y para el otro. (usar la media)
+// media = (li -ls)/2 => Li(limite inferior), Ls(Limite superior)(casi siempre 0)(cant de elementos  del archivo)
+int cargarEnArbolDatosEnOrden(tArbol *pa, void *origen, int (*leer)(tInfo *, void *, int), int li, int ls){
+tInfo info;
+int m;
+int r;
+
+if(li>ls) return 1;
+m = (li+ls)/2;
+
+r = leer(&info,origen,m);
+if(!r) return 0; //error
+*pa = (tNodo *)malloc(sizeof(tNodo));
+if(!*pa) return 0; // sin mem
+(*pa)->info = info;
+(*pa)->izq = (*pa)->der = NULL;
+r = cargarEnArbolDatosEnOrden(&(*pa)->izq,origen,leer,li,m-1); //iserto a la izquierda
+if(r!=1) return r;
+
+return cargarEnArbolDatosEnOrden(&(*pa)->der,origen,leer,ls,m+1); // inserto a la derecha
+
+}
+
+
+
+
+void insertarDondeQuierasEnOrden(const tArbol *pa, void * param, void (* accion)(tInfo, void *))
+{
+    if(!*pa)                    // caso base, si existe el arbol
+        return;
+    insertarDondeQuierasEnOrden(&(*pa)->izq,param,accion); //izq
+    printf("\n %d",(*pa)->info); //nodo
+    accion(&(*pa)->info, param);
+    insertarDondeQuierasEnOrden(&(*pa)->der,param,accion); //der
+}
+
+void insertarEnArchivoTxt(tInfo *pi,void *varch )
+{
+    FILE  *arch =(FILE *)varch;
+    fprintf(arch,"%d",pi);
+}
+
+
+
+void insertarEnArchivoBin(tInfo *pi,void *varch )
+{
+    FILE  *arch =(FILE *)varch;
+    fwrite(pi,sizeof(pi),1,arch);
+}
+
+
+
+
+//void inst_list(tInfo *pi, void *list){
+//tLista *pl = (tLista *)list;
+//insertar_ord_lista(pl,pi,cmp)
+//
+//}
+
+
+
+// Considero que el archivo ya esta abierto y en la posicion en la que quiero empezar a escribir
+int cargarArbolArchivoPreOrden(tArbol *pa, FILE *fp, int (* cmp) (const tInfo *, const tInfo *)){
+
+tInfo *info;
+fread(&info, sizeof(tInfo),1,fp);
+while(!feof(fp)){
+
+insertarEnArbol(pa,&info,cmp);
+fread(&info, sizeof(tInfo),1,fp);
+}
+return 1;
+}
+
+
+int cargarArbolDeDondeSeaEnPreOrden(tArbol *pa, void *origen,
+                          int (*cmp)(const tInfo *, const tInfo *),
+                          int (*leer)(tInfo *, void *))
+{
+int r;
+tInfo info;
+while(leer(&info,origen)){
+
+ r = insertarEnArbol(pa,&info,cmp);
+ if(r!=1) return r;
+
+}
+return 1;
+
+}
+
+
+int leer_bin(int *pi, void *varch){
+
+FILE *arch = (FILE *)varch;
+fread(pi,sizeof(int),1,arch);
+if(feof(arch)) return 0; // si no pude leer me voy
+return 1;
+
+}
+
+
+int leerTxt(int *pi, void *varch){
+int r;
+FILE *arch = (FILE *)varch;
+r = fscanf("%d\n",pi);
+if(r == EOF) return 0;
+return 1;
+}
+
+
+////////////////////////////////////// OBTENER MAYOR ////////////////////////////////////
+
+/*
+//// Requiere una carga inicial de info para empezar a comparar 
+    t_info alumnoMayor;
+    alumnoMayor = (*pa)->info;   // carga inicial para comparar
+    mayor_info_arbol(pa,&alumnoMayor,comparar_promedios);
+    mostrar_alumno(&alumnoMayor);
+*/
+
+
+void mayor_info_arbol(const t_arbol* pa,t_info *mayor,int (*cmp)(const t_info*, const t_info*))
+{
+    if(!*pa)
+            return;
+    mayor_info_arbol(&(*pa)->pizq,mayor,cmp);  // voy para la izq para desp recorrer todo el arbol
+
+    if(cmp(&(*pa)->info,mayor) > 0)    //mientras lo que tengo sea mayor a lo que habia 
+    {
+        *mayor = (*pa)->info;           //pongo en mayor el dato 
+    }
+
+    mayor_info_arbol(&(*pa)->pder,mayor,cmp);   //me muevo para la derecha
+}
+
+
+///////////////////////////////Arbol Grafico///////////////////////////////
+void arbolGrafico(t_arbol *pa,int nivel)
+{
+    if(*pa==NULL)
+        return;
+    arbolGrafico(&(*pa)->pder,nivel+1);
+    asignarTabulaciones(nivel);
+    printf("%d\n",(*pa)->info.dni);
+    arbolGrafico(&(*pa)->pizq,nivel+1);
+}
+
+void asignarTabulaciones(int nivel)
+{
+    int i;
+    for(i=0;i<nivel;i++)
+        printf("\t");
+}
+
+////////////////////////////////insertar_en_arbol_bin_busq /////////////////////////////////////////////////////////////////////
+int insertar_en_arbol_bin_busq(t_arbol* pa, const t_info* pd, int (*cmp)(const t_info*, const t_info*) )
+{
+    int comp;
+    t_nodo_arbol *nuevo_nodo;
+    if(*pa!=NULL)
+    {
+    if((comp=cmp(pd,&(*pa)->info))>0)
+        return insertar_en_arbol_bin_busq(&(*pa)->pder,pd,cmp);
+    else if(comp<0)
+        return insertar_en_arbol_bin_busq(&(*pa)->pizq,pd,cmp);
+    else
+        return DUPLICADO;
+    }
+    nuevo_nodo=(t_nodo_arbol*)malloc(sizeof(t_nodo_arbol));
+    if(nuevo_nodo==NULL)
+        return SIN_MEM;
+    nuevo_nodo->info=*pd;
+    nuevo_nodo->pder=NULL;
+    nuevo_nodo->pizq=NULL;
+    *pa=nuevo_nodo;
+    return TODO_OK;
+}
+
+/////////////////// cargar_arbol_de_archivo_ordenado ////////////////////////////////////////////////////////////////////////////
+int cargar_arbol_de_archivo_ordenado(t_arbol* pa, const char* path)
+{
+    FILE* pf;
+    int max_reg_arch;
+    pf=fopen(path,"rb");
+    if(pf==NULL)
+        return ERROR_ARCHIVO;
+    fseek(pf,0L,SEEK_END);
+    max_reg_arch=(ftell(pf)/sizeof(t_info))-1;
+    return cargar_arbol_ordenado(pa,pf,0,max_reg_arch);
+}
+
+
+int cargar_arbol_ordenado(t_arbol *pa,FILE* pf,int li,int ls)
+{
+    int media=(li+ls)/2;
+    t_nodo_arbol* nuevo_nodo;
+    if(li>ls)
+        return TODO_OK;
+    fseek(pf,media*sizeof(t_info),SEEK_SET);
+    nuevo_nodo=(t_nodo_arbol*)malloc(sizeof(t_nodo_arbol));
+    if(nuevo_nodo==NULL)
+        return SIN_MEM;
+    fread(&(nuevo_nodo->info),sizeof(t_info),1,pf);
+    *pa=nuevo_nodo;
+    nuevo_nodo->pder=NULL;
+    nuevo_nodo->pizq=NULL;
+    cargar_arbol_ordenado(&(*pa)->pizq,pf,li,media-1);
+    cargar_arbol_ordenado(&(*pa)->pder,pf,media+1,ls);
+    return TODO_OK;
+}
+
+
+//////////////////  ELIMINAR RAIZ (RECURSIVA) //////////////////////////// 
+int eliminar_raiz(t_arbol *pa){
+
+t_arbol *aux;
+t_nodo_arbol *pelim;
+if(!*pa) return 0;
+
+if(altura_arbol(&(*pa)->izq > altura_arbol(&(*pa)->der)))
+{
+    aux = mayor_nodo(&(*pa)->pizq);
+}else{
+    aux = menor_nodo(&(*pa)->pder);
+}    
+pelim = *aux;
+(*pa)->info = pelim->info;
+if(pelim->izq){
+    *aux = pelim->izq;
+}else{
+    *aux = pelim->der;
+}
+free(pelim);
+return 1;
+}
+
+
+
+///////////////////////////RECORRER ARBOL EN ORDEN DESDE ARCHIVO ////////////////////////////////////////
+
+ recorrer_arbol_en_orden(pa,mostrarArchOrdenado,arch); // asi se usa
+
+void recorrer_arbol_en_orden(const t_arbol* pa, void (*accion)(t_info* pinfo, void* datos_accion), void* datos_accion)
+{
+    if(!*pa) return;
+    recorrer_arbol_en_orden(&(*pa)->pizq,accion,datos_accion);
+    accion(&(*pa)->info,datos_accion);
+    recorrer_arbol_en_orden(&(*pa)->pder,accion,datos_accion);
+}
+
+
+/// seria la accion a realizar
+void mostrarArchOrdenado(t_info* pinfo, void* datos_accion){
+ t_alumno alu;
+ FILE  *arch =(FILE *)datos_accion;
+ fseek(arch,sizeof(t_alumno)*pinfo->nro_reg,SEEK_SET);  // me muevo x registros desde el comienzo
+ fread(&alu,sizeof(t_alumno),1,arch);
+ mostrar_alumno(&alu);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////  archivos y arbol/////////////////////////////////////////////////////////////////////
+
+
+void actualizar_reg(t_info * original, const t_info *nuevo )
+{
+    original->nro_reg=nuevo->nro_reg;
+}
+
+int compactar_y_reindexar(FILE ** arch, t_arbol * pindice, const char * path)
+{
+    FILE *fpNue;
+    t_alumno alu;
+    t_reg_ind indice;
+    int nroReg = 0;
+
+    if(!*arch)
+        return ERROR_ARCHIVO;
+    fpNue = fopen(PATH_ALU_TEMP,"wb");
+
+    if(!fpNue)
+        return ERROR_ARCHIVO;
+     rewind(*arch);
+     fread(&alu,sizeof(t_alumno),1,*arch);
+     while(!feof(*arch)){
+        if(alu.estado == 'A')
+        {
+            fwrite(&alu,sizeof(t_alumno),1,fpNue);
+            indice.dni = alu.dni;
+            indice.nro_reg = nroReg;
+            nroReg ++;
+            actualizar_insetar(pindice,&indice,comparar_dni,actualizar_reg);
+        }
+        fread(&alu,sizeof(t_alumno),1,*arch);
+     }
+    fclose(fpNue);
+    fclose(*arch);
+    remove(path);
+    rename(PATH_ALU_TEMP,path); //renombro el path
+    *arch=fopen(path,"r+b");
+    return TODO_OK;
+}
+
+int actualizar_insetar(t_arbol *pa,const t_info *info,int (*cmp)(const t_info *op1,const t_info *op2),void(*act)(t_info * original, const t_info *nuevo )){
+
+
+  int comp;
+    while(*pa && (comp=cmp(info,&(*pa)->info))!=0 )
+    {
+        if(comp < 0)
+        {
+            pa=&(*pa)->pizq;
+        }else
+        {
+            pa=&(*pa)->pder;
+        }
+    }
+    if(*pa && comp==0)
+    {
+        //duplicados
+        act(&(*pa)->info,info);
+        return TODO_OK;
+    }
+    *pa=(t_nodo_arbol *)(malloc(sizeof(t_nodo_arbol)));
+    if(!*pa)
+        return SIN_MEM;
+    (*pa)->info= *info;
+    (*pa)->pder = NULL;
+    (*pa)->pizq = NULL;
+    return TODO_OK;
+
+
+}
+
+
+
+////////////////////////////////////// !!!!!  ELIMINAR NODO DE ARBOL !!!!! /////////////////////////////////////////////////////
+
+tInfo  buscar_candidato_por_derecha2(t_arbol *arbol)
+{
+    t_nodo *aux;
+    tInfo dato;
+    if((*arbol)->pder!=NULL)
+        return buscar_candidato_por_derecha2(&(*arbol)->pder);
+    else
+    {
+        aux=(*arbol)->pizq;/** si tiene null es hoja*/
+        dato=(*arbol)->info;
+        free(*arbol);
+        *arbol=aux;
+        return dato;
+    }
+    return dato;
+
+}
+
+tInfo  buscar_candidato_por_izq2(t_arbol *arbol)
+{
+    t_nodo *aux;
+    tInfo dato;
+    if((*arbol)->pizq!=NULL)
+        return  buscar_candidato_por_izq2(&(*arbol)->pizq);
+    else
+    {
+        aux=(*arbol)->pder;/** si tiene null es hoja*/
+        dato=(*arbol)->info;
+        free(*arbol);
+        *arbol=aux;
+        return dato;
+    }
+    return dato;
+}
+
+int eliminar_nodo_donde_este(t_arbol * arbol,tInfo *pinfo,int (*cmp)(const tInfo*, const tInfo*))
+{
+    tInfo aux;
+    if(*arbol==NULL)
+        return 0;
+    if( cmp(&(*arbol)->info,pinfo) == 0)
+    {
+        if((*arbol)->pizq!=NULL||(*arbol)->pder!=NULL)
+        {
+            if(alturaArbol(&(*arbol)->pizq)>=alturaArbol(&(*arbol)->pder))
+                aux=buscar_candidato_por_derecha2(&(*arbol)->pizq);
+            else
+                aux=buscar_candidato_por_izq2(&(*arbol)->pder);
+            (*arbol)->info=aux;                                           /**reemplazo candidato**/
+            return 1;
+        }
+        else
+        {
+            free(*arbol);
+            *arbol=NULL;
+            return 1;
+        }
+    }
+    eliminar_nodo_donde_este(&(*arbol)->pizq,pinfo,cmp);
+    eliminar_nodo_donde_este(&(*arbol)->pder,pinfo,cmp);
+
+    return 0;
+}

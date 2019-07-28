@@ -1,0 +1,84 @@
+
+/*
+
+/// PILA ESTATICA   ///////////////////////////////////////
+
+#define TAM_PILA 5
+
+typedef struct
+{
+
+    tInfoE pila[TAM_PILA];
+    int tope;
+
+}tPilaE;
+
+*/
+
+
+// Pila estatica
+
+//  |   |
+//  |___|  en la pila siempre queda apuntando al tope y para llegar hasta abajo hay que ir desapilando
+
+
+#define TAM_PILA 5
+
+int crearPila_E(tPilaE *p)
+{
+    p->tope = 0;
+
+}
+
+int pilaVacia_E(tPilaE *p)
+{
+    return p->tope == 0;
+
+}
+
+int pilaLlena_E(tPilaE *p)
+{
+    return p->tope == TAM_PILA;
+
+}
+
+int apilar_E(tPilaE *p, tInfoE *d)
+{
+    if(p->tope == TAM_PILA) return 0; // si no esta llena puedo apilar
+
+
+    p->pila[p->tope] = *d;  // coloco en la pila el dato en la posicion del tope
+
+    p->tope ++;             // aumento el tope
+
+    return 1;
+}
+
+
+int desapilar_E(tPilaE *p, tInfoE *d)
+{
+
+    if(p->tope == 0) return 0; // me fijo si este vacia
+
+    p->tope --;             // decremento el tope decremento antes por que cuando apile incremente el tope entonces en el tope no hay nada
+
+    *d = p->pila[p->tope];   // guardo el dato en del tope de la pila
+
+    return 1;
+
+}
+
+int verPrimeroEnPila_E(tPilaE *p, tInfoE *d)
+{
+    if(p->tope == 0)return 0; // reviso si esta vacia
+
+    *d = p->pila[p->tope -1]; // tope -1 por que cuando apile luego de colocar el dato incremente el tope
+
+    return 1;
+}
+
+
+void vaciarPila_E(tPilaE *p)
+{
+    p->tope = 0;
+}

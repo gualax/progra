@@ -1,0 +1,283 @@
+void LLcreate(t_LL * LL)
+{
+    *LL = NULL;
+}
+
+void LLdestroy(t_LL * LL)
+{
+    t_LLnode * node = NULL;
+
+    if(!*LL) return;
+
+    while(*LL != (*LL)->next)
+    {
+        node = (*LL)->next;
+        (*LL)->next = node->next;
+        free(node);
+    }
+
+    free(*LL);
+    *LL = NULL;
+}
+
+
+int LLempty(t_LL * LL)
+{
+    return !*LL;
+}
+
+
+int LLfull(t_LL * LL)
+{
+    t_LLnode * node = NULL;
+
+    if(!*LL) return 0;
+
+    if(!(node = (t_LLnode *) malloc (sizeof(t_LLnode))))
+        return 0;
+
+    free(node);
+    return 1;
+}
+
+
+int LLinsertorder(t_LL * LL, t_cmp cmp, const t_LLinfo * info)
+{
+    t_LLnode * node = (t_LLnode *) malloc (sizeof(t_LLnode)),
+             * root = *LL;
+    if(!node) return 0;
+
+    node->info = *info;
+
+    if(!*LL)
+    {
+        node->next = node;
+    }
+    else
+    {
+        if(cmp(&info->data, &(*LL)->info.data) < 0)
+        {
+            LL = &(*LL)->next;
+
+            while(*LL != root && cmp(&info->data, &(*LL)->info.data) > 0)
+                LL = &(*LL)->next;
+
+            node->next = *LL;
+        }
+        else
+        {
+            node->next  = (*LL)->next;
+            (*LL)->next = node;
+        }
+    }
+
+    *LL = node;
+
+    return 1;
+}
+
+
+int LLpushlast(t_LL * LL, const t_LLinfo * info)
+{
+    t_LLnode * node = (t_LLnode *) malloc (sizeof(t_LLnode));
+    if(!node) return 0;
+
+    node->info  = *info;
+
+    if(!*LL)
+    {
+        node->next = node;
+    }
+    else
+    {
+        node->next  = (*LL)->next;
+        (*LL)->next = node;
+    }
+
+    *LL = node;
+
+    return 1;
+}
+
+
+int LLpushfirst(t_LL * LL, const t_LLinfo * info)
+{
+    t_LLnode * node = (t_LLnode *) malloc (sizeof(t_LLnode));
+    if(!node) return 0;
+
+    node->info  = *info;
+
+    if(!*LL)
+    {
+        node->next = node;
+        *LL = node;
+    }
+    else
+    {
+        node->next = (*LL)->next;
+        (*LL)->next = node;
+    }
+
+    return 1;
+}
+
+
+int LLpopfirst(t_LL * LL, t_LLinfo * info)
+{
+    t_LLnode * node = NULL;
+
+    if(!*LL) return 0;
+
+    node  = (*LL)->next;
+    *info = node->info;
+
+    if(*LL != node)
+        (*LL)->next = node->next;
+    else
+        *LL = NULL;
+
+    free(node);
+
+    return 1;
+}
+
+
+int LLpoplast(t_LL * LL, t_LLinfo * info)
+{
+    t_LLnode * cur = *LL;
+
+    if(!cur) return 0;
+
+    *info = cur->info;
+
+    do
+    {
+        cur = cur->next;
+    }while(cur->next != *LL);
+
+    if(cur->next == (*LL)->next)
+        cur = NULL;
+    else
+        cur->next = (*LL)->next;
+
+    free(*LL);
+    *LL = cur;
+
+    return 1;
+}
+
+
+int LLdeleteallmatch(t_LL * LL, t_cmp cmp, const t_LLinfo * info)
+{
+    t_LLnode * node  = NULL,
+             * pPrev = NULL;
+    t_LL * root = LL;
+
+    int count = 0;
+
+    if(!*LL) return count;
+
+    root = LL;
+    LL = &(*LL)->next;
+
+    while(*LL != *root)
+    {
+        if(cmp(&info->data, &(*LL)->info.data))
+        {
+            pPrev = *LL;
+            LL = &(*LL)->next;
+        }
+        else
+        {
+            node = *LL;
+            *LL = node->next;
+            free(node);
+            count++;
+        }
+    }
+
+    if(!cmp(&info->data, &(*LL)->info.data))
+    {
+        if(*LL == (*LL)->next)
+        {
+            free(*LL);
+            *root = NULL;
+        }
+        else
+        {
+            node = *LL;
+            *LL = node->next;
+            *root = pPrev;
+            free(node);
+        }
+
+        count++;
+    }
+
+    return count;
+}
+
+int LLreverse(t_LL * LL)
+{
+    t_LLnode *root,
+             *prev,
+             *cur,
+             *last;
+
+    if (!*LL) return 0;
+
+    root = (*LL)->next;
+
+    last = *LL;
+    prev = *LL;
+    cur  = (*LL)->next;
+
+    *LL = (*LL)->next;
+
+    while (*LL != last)
+    {
+        *LL = (*LL)->next;
+
+        cur->next = prev;
+        prev = cur;
+        cur  = *LL;
+    }
+
+    cur->next = prev;
+    *LL = root;
+
+    return 1;
+}
+
+t_LLnode * LLgetmiddle(t_LL * LL, t_LLinfo * info)
+{
+    t_LLnode * cur1,
+             * cur2;
+
+    if (!*LL) return 0;
+
+    cur1 = cur2 = (*LL)->next;
+
+    while (cur2->next != *LL)
+    {
+        cur2 = cur2->next->next;
+        cur1 = cur1->next;
+    }
+
+    *info = cur1->info;
+
+    return cur1;
+}
+
+void LLtraverse(t_LL * LL, t_task task)
+{
+    t_LLnode * root = *LL;
+
+    if(!*LL) return;
+
+    do
+    {
+        LL = &(*LL)->next;
+        task(LL, NULL, NULL);
+    }while(*LL != root);
+}

@@ -1,0 +1,111 @@
+/*
+/// COLA ESTATICA //////////////////////////////////////
+
+#define TAM_COLA  5
+
+typedef int tInfoE;
+
+
+typedef struct
+{
+    tInfoE cola[TAM_COLA];
+
+    int pri,
+        ult,
+        cont;
+
+}tColaE;
+
+*/
+
+////  COLA ESTATICA //////
+
+// EL PRIMERO EN LLEGAR ES EL PRIMERO EN SALIR ///
+// El ult siempre es 1 - que el primero si empiezo con pri = 0 entonces el ult empieza en -1
+//   |____| -> |____| -> |___|->
+
+
+int crearCola_E(tColaE *p)
+{
+
+   p->pri = 0;
+   p->ult = -1;
+   p->cont = 0;
+
+
+}
+
+
+int colVacia_E(tColaE *p)
+{
+
+   return p->cont == 0;
+
+}
+
+int colaLlena_E(tColaE *p)
+{
+
+    return p->cont == TAM_COLA;
+
+}
+
+
+int encolar_E(tColaE *p, tInfoE *d)
+{
+
+    if(p->cont == TAM_COLA) return 0;
+
+    p->ult ++;  // como no esta  llena muevo el ultimo
+
+        if(p->ult == TAM_COLA)    // si ult  = tam_cola entones me  pase y tengo qdar la vuelta
+        {
+            p->ult = 0;
+
+        }
+
+    p->cola[p->ult] = *d; // coloco la info en el ultimo lugar de la cola
+
+    p->cont ++; //aumento la cantidad
+
+    return 1;
+}
+
+
+int desencolar_E(tColaE *p, tInfoE *d)
+{
+
+    if(p->cont == 0) return 0;  // me fijo si esta vacia
+
+    *d = p->cola[p->pri];
+
+   if(p->pri == TAM_COLA)  //  si pri es igual a tam de cola entoces me pase tengo q dar la vuelta
+    {
+        p->pri = 0;
+    }
+
+    p->cont --; // decremento la cantidad
+
+
+    return 1;
+}
+
+void vaciarCola_E(tColaE *p )
+{
+
+    p->pri = 0;
+    p->ult= -1;
+    p->cont = 0;
+
+}
+
+
+
+int primeroEnCola_E(tColaE *p, tInfoE *d)
+{
+    if(p->cont == TAM_COLA) return 0;
+
+    *d = p->cola[p->pri];
+
+    return 1;
+}
