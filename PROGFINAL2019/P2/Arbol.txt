@@ -332,6 +332,8 @@ int cargarArchivoOrdEnArbol(tArbol *pa, FILE *fp)
     return 1;
 }
 
+
+
 int insertarArchivoOrdenadOEnArbol(tArbol *pa, FILE *fp, int LI, int LS)
 {
     tInfo datos;
@@ -360,7 +362,7 @@ int insertarArchivoOrdenadOEnArbol(tArbol *pa, FILE *fp, int LI, int LS)
 
 
 
-
+//sirve para cargar un arbol desde un archivo, no estoy seguro si los datos estan en orden o esto los ordena
 // LI - Ls izquierda
 // Li + Ls derecha
 //Si lo hago como en preOrden me queda como una lista, asi que hay que hacerlo diferente
@@ -389,7 +391,7 @@ return cargarEnArbolDatosEnOrden(&(*pa)->der,origen,leer,ls,m+1); // inserto a l
 
 
 
-
+// Sirve para insertar por ejemplo en un archivo, desde un arbol
 void insertarDondeQuierasEnOrden(const tArbol *pa, void * param, void (* accion)(tInfo, void *))
 {
     if(!*pa)                    // caso base, si existe el arbol
@@ -424,7 +426,7 @@ void insertarEnArchivoBin(tInfo *pi,void *varch )
 //}
 
 
-
+Cargo un arbol con datos provenientes de un archivo, en pre orden quiere decir, como vienen
 // Considero que el archivo ya esta abierto y en la posicion en la que quiero empezar a escribir
 int cargarArbolArchivoPreOrden(tArbol *pa, FILE *fp, int (* cmp) (const tInfo *, const tInfo *)){
 
