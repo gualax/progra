@@ -527,3 +527,104 @@ void* mi_replace_ocurrencia_cad(char *str, char *substr, char *remplazo)
 	  }
 
 }
+
+
+/*
+Validación del número de cuenta bancaria:
+•	El número de cuenta es un número secuencial de 6 dígitos.
+•	Contiene un dígito verificador de cuenta que se agrega al final del número de cuenta precedido por una barra.
+•	El dígito verificador se calcula como: la suma de las cifras hasta que quede un solo dígito de
+   de la resta entre dígitos pares y los dígitos impares del número de cuenta.
+
+Número secuencial: 637043
+	674 - 303= 371
+	3+7+1=11
+	1+1=2
+	Número de cuenta con el dígito verificador= 637043/2
+*/
+
+int validar_nro_cuenta(const t_movimiento_banco * c1)
+{
+char  *c = c1->cod_cta;
+    //reservo memoria
+char *impares = malloc(strlen(c)-2);
+char *pares = malloc(strlen(c)-2);
+int cont = strlen(c);
+printf("strlen %d",cont-2);
+int numPar, numImpar, result, verif, numVerif;
+while(*c){
+    if(*c != '/'){//es par
+         if(cont%2 == 0){
+            *pares = *c;
+            pares++;
+            c++;
+            cont ++;
+         }else{ //es impar
+            *impares = *c;
+            impares++;
+            c++;
+            cont++;
+         }
+    }else{
+        printf("***** nunca pasa por aca *** ");
+        c++;  //estoy parado en la /
+        verif = toInt(*c);
+        c ++;  // termino
+     }
+}
+*pares = '\0';
+*impares = '\0';
+//me posiciono al principio
+do{
+impares--;
+}while(*impares);
+impares++;
+
+// me posiciono al  principio
+do{
+pares--;
+}while(*pares);
+pares++;
+
+// los convierto a numero
+printf("\n impares %s",impares);
+printf("\n pares %s", pares);
+
+numImpar = atoi(impares);
+numPar = atoi(pares);
+
+printf("\n numImpar %d",numImpar);
+printf("\n numPar %d", numPar);
+result = abs(numImpar - numPar);
+printf("\n result %d",result);
+
+numVerif = calcularVerifiador(result);
+printf("\n numVerif %d",numVerif);
+printf("\n verif %d",verif);
+
+if(numVerif != verif){
+    return 0;
+}
+
+return 1;
+}
+
+
+int calcularVerifiador(int result){
+int res = result;
+int centenas;
+int decenas;
+int unidades;
+
+do{
+ centenas = (res)/100;
+ decenas = (res - (centenas*100))/10;
+ unidades = res - (centenas*100 + decenas*10 );
+
+ res = centenas + decenas + unidades;
+ printf("res %d",res);
+}while((res/10) > 0);
+
+return res;
+}
+
