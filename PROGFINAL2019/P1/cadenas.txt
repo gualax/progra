@@ -662,3 +662,25 @@ return MAL_PARENT;
 }
 
 }
+
+
+//Desencripta una palabra con el criterio: se toma el primer caracter de la palabra y se pone el siguiente, para el segundo el siguiente del siguiente y asi
+// considerar que el siguiente de la 'z' es la 'A' y el siguiente de la 'Z' es la 'a'
+// NgqhjF -> Mendez
+char * algoritmoDesencript(char *cad){
+char *ini = cad;
+printf("\n %s\n ",ini);
+int cantCar=0;
+char caracter;
+while(*ini){
+ cantCar ++;
+  caracter = (*ini - cantCar);
+  if(caracter < 'A') caracter +=  abs('z' - 'A') + 1;
+  if(caracter > 'z') caracter -=  abs('z' - 'A') + 1;
+  if(caracter < 'a' && caracter > 'Z') caracter -=  abs('a' - 'Z') - 1;
+ *cad = caracter;
+ cad++;
+ ini++;
+}
+return *cad;
+}
