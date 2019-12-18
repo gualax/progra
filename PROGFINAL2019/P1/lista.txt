@@ -350,3 +350,173 @@ nue->sig = *p;
 
 return 1;
 }
+
+
+
+
+
+
+
+
+// buscar el menor intercambiar y avanzar, el total de la lista -1 o hasta que el sig sea null
+//void ordenar_lista_x_seleccion(tLista *pl, int (* buscar_menor)(const tInfo *, const tInfo *)){
+//tNodo * nodo;
+//tLista * menor;
+//if(!pl) return 0;
+//
+//while((*pl)->sig) //hasta que el sig sea null
+//{
+//        menor = buscar_menor(&pl, comp);// buscar_menor devuelve un tLista
+//        if(pl!= menor)
+//            mover_nodos(&pl,menor);
+//        pl = &(*pl)->sig;
+//}
+//
+//}
+//
+//
+//tLista buscar_menor_lista(const tLista *pl,int (* comp)(const tInfo *, const tInfo *))
+//{
+// tLista *men = pl;
+// if(*pl){
+//
+//    pl = &(*pl)->sig;
+//
+//    while(*pl){
+//        if(comp(&(*men)->info,&(*pl)->info))
+//            men = pl;
+//
+//        pl = &(*pl)->sig;
+//    }
+//return (tLista *) men;
+// }
+
+//}
+
+void mover_nodo_a_pri(tLista *n1, tLista *n2)
+{
+ tNodo *mov = *n2;
+ //sacar
+ *n2 = mov->sig;
+ //poner pri
+ mov->sig = *n1;
+ *n1 = mov;
+}
+
+
+
+int buscar_elemento(tLista *pl, tInfo *d,int (*comp)(const tInfo *,const tInfo *)){
+
+if(!*pl) return 0;
+
+while(*pl)
+{
+    if(comp(&(*pl)->info,d) == 0)
+    {
+        printf("\n Lo encontre ");
+        mostrarInfo(&(*pl)->info);
+        return 1;
+    }
+    pl = &(*pl)->sig;  //avanzo
+}
+
+return 0;
+}
+
+
+// INSERTAR 5 ELEMENTOS EN LISTA! ORDENA DE MENEOR A MAYOR
+
+int insertarElementoEnListaOrdenadoHasta5elementos(tLista *p,const tInfo *d, int (* comp)(const tInfo *, const tInfo *))
+{
+tNodo *nue;
+int cmp = 1;
+int cont = 0;
+
+while(*p && (cmp = comp(d,&(*p)->info)> 0) && cont < 5 ){ // comparo para insertar
+    p = &(*p)->sig;
+    cont ++;
+}
+if(cont == 5){
+    return 0;
+}
+
+nue = (tNodo *)malloc(sizeof(tNodo));
+if(!nue) return 0;
+nue->info = *d;
+nue->sig = *p;
+*p = nue;
+
+while(*p && cont < 5){
+cont ++;
+ p = &(*p)->sig;
+}
+if(*p){
+    free(*p);
+    *p == NULL;
+}
+
+
+return 1;
+}
+
+
+
+// ORDENAR LISTA CONSTA DE LAS SIGUIENTES 3 FUNCIONES /////////
+
+
+void intercambiar_nodos(t_nodo ** ppn1, t_nodo ** ppn2){
+    t_nodo * pn1, * pn2, * psig, * paux;
+
+    if((*ppn2)->psig == *ppn1){
+        //POR LAS DUDAS QUE SEAN ADYACENTES Y ADEMAS ESTEN APUNTANDO AL REVES
+        paux = *ppn1;
+        *ppn1 = *ppn2;
+        *ppn2 = paux;
+    }
+    if((*ppn1)->psig == *ppn2){
+        //GUARDO EN VARIABLES AUXILIARS LAS DIRECCIONES
+        //SOLO ENTRO ACA CUANDO SEAN ADYACENTES
+        pn1 = *ppn1;
+        pn2 = *ppn2;
+        psig = pn2->psig;
+
+        //EMPIEZO..
+        *ppn1 = pn2;
+        *ppn2 = psig;
+        pn2->psig = pn1;
+    }else{
+        //ENTRO POR ESTE ELSE CUANDO NO SEAN ADYACENTES
+        paux = (*ppn1)->psig;
+        (*ppn1)->psig = (*ppn2)->psig;
+        (*ppn2)->psig = paux;
+
+        paux = *ppn1;
+        *ppn1 = *ppn2;
+        *ppn2 = paux;
+    }
+}
+
+void ordenar_lista(t_lista * plista, t_cmp cmp){
+    t_nodo ** pi, ** pmenor;
+
+    if(*plista == NULL)
+        return;
+    pi = plista;
+    while((*pi)->psig){
+        pmenor = buscar_menor(pi, cmp);
+        if(*pi != *pmenor)
+            intercambiar_nodos(pi, pmenor);
+        pi = &(*pi)->psig;
+    }
+}
+
+t_nodo ** buscar_menor(t_lista * plista, t_cmp cmp){
+    t_nodo ** pmenor = plista;
+    t_nodo ** pact = &(*plista)->psig;
+    while(*pact){
+        if(cmp(&(*pact)->info, &(*pmenor)->info) < 0)
+            pmenor = pact;
+        pact = &(*pact)->psig;
+    }
+    return pmenor;
+}
