@@ -628,3 +628,37 @@ do{
 return res;
 }
 
+
+
+// Indica si una oracion esta bien parentizada "((a x b ) + ( d ))"
+int parentizada_a(const char *s)
+{
+
+char *ini = s;
+char *fin = (s +strlen(s)-1);
+int parentDer =0, parentIzq=0, cantParent=0;
+if(*ini == ')' || *fin == '(') return MAL_PARENT;
+
+
+while(*ini){
+
+    if(*ini == ')'){
+        parentDer ++;
+    }
+    if(*ini == '('){
+        parentIzq ++;
+    }
+    ini ++;
+}
+
+
+if(parentDer == parentIzq && (*ini=='(' && *fin == ')') || cantParent == 0 ){
+    //bien parentizada
+    return BIEN_PARENT;
+
+}else{
+
+return MAL_PARENT;
+}
+
+}

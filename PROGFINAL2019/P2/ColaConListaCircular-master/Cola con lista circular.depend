@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1382042294 source:c:\users\marcos.marcos-pc\google drive\unlam 2013\programacion\tp2\cola con lista circular\main.c
+	<stdio.h>
+	<stdlib.h>
+	"primitivas.h"
+	"global.h"
+
+1382043758 c:\users\marcos.marcos-pc\google drive\unlam 2013\programacion\tp2\cola con lista circular\primitivas.h
+	"global.h"
+
+1382043707 c:\users\marcos.marcos-pc\google drive\unlam 2013\programacion\tp2\cola con lista circular\global.h
+
+1382042294 source:c:\users\marcos.marcos-pc\documents\github\cola con  lista circular\colaconlistacircular\main.c
+	<stdio.h>
+	<stdlib.h>
+	"primitivas.h"
+	"global.h"
+
+1382043758 c:\users\marcos.marcos-pc\documents\github\cola con  lista circular\colaconlistacircular\primitivas.h
+	"global.h"
+
+1382055287 c:\users\marcos.marcos-pc\documents\github\cola con  lista circular\colaconlistacircular\global.h
+

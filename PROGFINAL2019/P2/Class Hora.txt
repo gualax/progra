@@ -136,3 +136,49 @@ Hora operator+(const Hora &obj, int num)
 static Hora Hora::getHoraMaxima(){
     return Hora (23,59,59);
 }
+
+////////////// main.c ///////////////////////////////////////////////////
+int main()
+{
+    /*
+    Hora  h1(23,59,59), h2(4), h3;
+    h3 = h1.suma(h2);
+
+    h3 = h2 + 5;
+    cout << "Hello world!" << endl;
+    */
+
+// UN MAIN DE FINAL (en base a este debo hacer las declaraciones del .h y las funciones del .c
+
+    Hora inicio, fin(0,0,20);
+
+    cout << "Ïngrese  hora inicio";
+    cin >> inicio;
+    cout << "Ingrese hora fin:  ";
+    cin >> fin;
+
+    if(inicio>=fin){
+
+        cout << "El horario de inicio debe ser <= al horario de fin";
+        return 0;
+    }
+
+
+    while(inicio<fin){
+       // system("CLS");
+        cout <<"Actual"<<inicio++<<"fin"<<fin;
+      //  Sleep(1000);
+    }
+
+    cout<<"fin";
+    Hora h1(22,554,21), h2(1,20,55), h3;
+    h3 = h1+h2;
+    cout<<h3<<endl;
+    h3 = 3 + h3;
+    cout<<h3;
+    h3 = Hora::getHoraMaxima();
+    cout<<h3;
+
+
+    return 0;
+}
