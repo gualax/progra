@@ -21,7 +21,7 @@ char miStrcpy(char *dest, const char *ori)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// STRCHR //////////////////////////////////////////////////
 /*/
 mi Strchr busca en la cadena un elemento y devuelve lo que esta despues de ese elemento
 
@@ -45,7 +45,7 @@ char  *miStrchr(const char *ori, int c)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// STRCMP ///////////////////////////////////////////////////////
 /// Comparar es strcmp y te dice si 2 textos son iguales
 int comparar(char *texto1, char *texto2)
 {
@@ -70,13 +70,13 @@ int comparar(char *texto1, char *texto2)
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////// ES BLANCO ////////////////////////////////////////////////////
 int esBlanco(char c)
 {
 
     return c == ' ' || c== '\t'
 }
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////// NORMALIZAR ////////////////////////////////////////////////////
 char * Normalizar(char *s)
 {
     char *ori = s;                  //cargo el texto en las variables
@@ -118,7 +118,7 @@ char * Normalizar(char *s)
     return s;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////A MAYUSCULA////////////////////////////////////////////////
 char aMayuscula(char c)
 {
 if(c >= 'a' && c<='z')
@@ -129,7 +129,7 @@ return c;
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////A MINUSCULA////////////////////////////////////////////////////
 char aMinuscula(char c)
 {
 if(c >= 'A' && c<='Z')
@@ -140,7 +140,7 @@ return c;
 
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// ITOA ///////////////////////////////////////////////////
 // Convierte int en string
 char* miItoa(char *s, int num, int base)
 {
@@ -182,7 +182,7 @@ char* miItoa(char *s, int num, int base)
     return s;
 
 }
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////// INVERTIR CADENA ///////////////////////////////////////////////////
 // INVIERTE LA CADENA
 char * invertirCadena(char *cad)
 {
@@ -199,7 +199,7 @@ printf("\n llego");
 
  while(aux>cad)
    {
-    inter=*cad;
+    inter=*cad; 
     *cad=*aux;
     *aux=inter;
     aux--;
@@ -684,3 +684,129 @@ while(*ini){
 }
 return *cad;
 }
+
+
+
+
+//////////////////// ANAGRAMA /////////////////////////////////////////////////////
+/// Ver si 2 palabras son anagramas..
+/// Un anagrama es una nueva palabra resultante de la transposición y cambio de orden de letras, palabras o frases.
+/// ejemplos: GOTA, “TOGA”,
+/// o también la palabra LAPICERO y sus anagramas POLARICE, COPLERIA, RECOPILA y COPILARE
+/// o bien la palabra CARPINTERO con el anagrama CREPITARON
+/// El aroma del amor.
+/// Le da Roma, le armo ...
+
+int esAnagrama(char *c1, char *c2){
+char *cad1 = c1;
+char *dest1 = c1;
+char *cad2 = c2;
+char *dest2 = c2;
+/// primero tengo que quitarles todos los caracteres raros a las cadenas
+/// y lo paso a minuscula, o mayuscula no importa mientras esten las 2 igual
+dest1 = limpiarCadenas(cad1);
+dest2 = limpiarCadenas(cad2);
+/// despues las tengo q ordenar alfabeticamente
+    // sin qsort no me salio =(
+qsort(dest1, strlen(dest1), sizeof(char), comparar);
+qsort(dest2, strlen(dest2), sizeof(char), comparar);
+/// Luego solo tengo q comparar si da igual entoces es anagrama sino no
+if(strcmp(dest1,dest2) == 0){
+    return 1;
+}
+
+return 0;
+}
+
+/// se fija si el caracter apuntado es alguno de los de abajo
+int esCaracterRaro(char c){
+int i;
+char caracter[4] = {' ',',','.','\t'};
+for(i=0;i<4;i++){
+    if(c == caracter[i]){
+        return 1;
+    }
+}
+return 0;
+
+}
+
+/// pasa un caracter a minuscula
+char aMinuscula(char c)
+{
+
+if(c >= 'A' && c<='Z')
+{
+    c +=32;
+}
+return c;
+}
+
+char *limpiarCadenas(char *s){
+char *cad = s;
+char *dest = s;
+while(*cad){
+if(esCaracterRaro(*cad)){
+    cad ++;
+}else{
+    *dest = aMinuscula(*cad);
+    *dest++;
+    *cad++;
+}
+}
+
+*dest = '\0';
+
+return s;
+}
+
+int comparar(const void *a, const void *b) {
+  // Castear a char y regresar lo que regresaría strcmp ;)
+  return strcmp((char *)a, (char *)b);
+}
+////////////////////FIN ANAGRAMA /////////////////////////////////////////////////////
+
+//////////////////// INVERTIR CADENA SEGUN NUMERO DE CARACTERES /////////////////////////////////////////////////////
+// ejemplo: 4juan7roberto -> 4nauj7otrebor  donde 4es la cant de letras de juan y 7 las de roberto
+// si quiero convertir cadenas que tengan espacios respetandolos dejo el "esBlanco"
+///invertirCadenaSegunNumeroDeCaracteres
+char * invertirCadena(char *cad)
+{
+char *aux=cad;
+char *inicio = cad;
+char inter;
+int cantInvert;
+int i;
+while(*cad){ /// mientras exista , la cadena
+while(esBlanco(*cad)){
+        cad++;
+}
+if(esNum(*cad)){   /// me fijo si es numero
+ aux=cad;           ///pongo el aux en el lugar de la cadena
+ cantInvert = (*cad -48);  /// conversion del caracter a numero(cantidad de lugares a invertir)
+ aux += cantInvert; /// muevo aux al final de esa parte de la cadena 2gv <--
+ if(!*aux) aux --;   ///si es la ultima parte de la cadena puede que me haya movido 1 de mas y este en \0
+ cad++;              ///asi q vuelvo 1
+}else{
+    while(aux>cad){   /// mientras la aux sea mas grande de la cadena (por que sino vuelvo a intercambiar y queda igual q como vino)
+     /// hago el intercambio
+        inter=*cad;
+        *cad=*aux;
+        *aux=inter;
+        aux--;
+        cad++;
+        }
+    /// aumento la cadena para el nuevo ciclo
+       cad++;
+      }
+ }
+ return inicio;
+}
+
+int esNum(char c){
+if( c >= '0' && c <= '9'){
+    return 1;
+}
+return 0;
+}
+//////////////////// FIN INVERTIR CADENA SEGUN NUMERO DE CARACTERES /////////////////////////////////////////////////////

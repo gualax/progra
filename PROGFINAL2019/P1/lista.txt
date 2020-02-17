@@ -113,6 +113,21 @@ void recorrerLista(tLista *p)
     }
 }
 
+/// mostrar lista del final al comienzo y  ver cuantos se mostraron
+/// usando recursividad 
+
+int recorrerListaAlReves(tLista *pl){
+int cant = 0;
+if(*pl)
+{
+    cant = mostrarListaAlReves(&(*pl)->sig);
+    printf("\n %d", (*pl)->info);
+    return cant + 1;
+}
+return 0;
+}
+
+
 
 int insertarEnOrden(tLista *p,const tInfoL *d, int (* comparar)(const tInfoL *a, const tInfoL *b))
 {

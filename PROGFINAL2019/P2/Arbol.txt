@@ -143,7 +143,7 @@ void mayor_info_arbol(const t_arbol* pa,t_info *mayor ,int (*cmp)(const t_info*,
 }
 
 
-
+////// ARBOL AVL  //////////////////////////////////////////////////////
 // es arbol avl si si la diferencia de altura entre izq y der es <=1
 int es_arbol_avl(const t_arbol* pa){
 int hi, hd;
@@ -172,6 +172,7 @@ int es_arbol_avl(const t_arbol* pa)
      return 0;	
 }
 
+//////// VACIAR ARBOL ENTERO ///////////////////////////////////
 ///  Vacia todo el arbol dejandolo como se creo
 //voy recorriendo el arbol por ambas ramas y liberando el espacio que recorri
 void vaciarArbolEntero(tArbol *pa)
@@ -188,6 +189,7 @@ void vaciarArbolEntero(tArbol *pa)
     }
 }
 
+//////////// VACIAR ARBOL DESDE CIERTO NIVEL ///////////////////////
 ///Poda el arbol desde cierto nivel hacia abajo
 //voy recorriendo y decrementando el nivel y cuando el nivel llega a la condicion niv == 0  entoces a partir de ahi elimino  todo
 void podarArbolxNivel(tArbol *pa, int nivel)
@@ -206,6 +208,7 @@ void podarArbolxNivel(tArbol *pa, int nivel)
     }
 }
 
+////////////////// CONTAR NODOS /////////////////////
 ///Cuenta la cantidad de nodos de todo el arbol
 // Para contar nodos llamo recursivamente a la funcion con su return + 1, esto hara que cada que vez que se llame
 // a la funcion esta retorne 1 + lo que tenia el return anterior y asi sucesivamente se van acumulando.
@@ -220,7 +223,7 @@ return 0;                   //si no existe devuelvo 0
 
 }
 
-
+////////////////// CONTAR NODOS X NIVEL /////////////////////
 ///Contar nodos x nivel, cuenta la cantidad de nodos Ya sean hojas o no, dependera del nivel
 //
 size_t contarNodosXnivel(tArbol *pa, int nivel)
@@ -235,6 +238,7 @@ return 0;                   //si no existe devuelvo 0
 
 }
 
+////////////////// CONTAR HOJAS /////////////////////
 /// cuenta las hojas del  arbol
 // si el nodo tiene izq y der en null entonces ese nodo es una hoja por lo tanto si encuentro eso retorno 1 y si no sigo recorriendo al final
 // el return de 1 se ira acumulando y sera lo que se devolvera

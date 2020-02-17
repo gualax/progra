@@ -107,27 +107,23 @@ if(!act) return 0; // lista vacia
 }
 
 
-void mostrarListaD(tListaD *pl)
+void mostrarLista(tListaD *lista)
 {
+    if(*lista!=NULL)
+    {
 
-tNodoLD *act;
-act = *pl;
+        while((*lista)->ant!=NULL) /// voy para atras hasta el principio
+            lista=&(*lista)->ant;
 
-if(!act) return ; //lista  vacia
-//primero voy para el principio de la  lista(Atras)
-while(act->ant)
-{
-    act = act->ant;
+        while((*lista)!=NULL)             /// ahora recorro hacia adelante mostrando
+        {
+            //printf("%d\n",(*lista)->info);
+            mostrar(&(*lista)->info);
+            lista=&(*lista)->sig;
+        }
+    }
 }
 
-while(act)
-{
-    mostrarPersona(&(act)->info);
-    act= act->sig;
-}
-
-
-}
 
 int compararXnroReg(tInfo *a, int b)
 {
