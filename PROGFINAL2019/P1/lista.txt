@@ -113,6 +113,7 @@ void recorrerLista(tLista *p)
     }
 }
 
+/////////////////////// MOSTRAR DE ATRAS PARA ADELANTE //////////////////////////////////////
 /// mostrar lista del final al comienzo y  ver cuantos se mostraron
 /// usando recursividad 
 
@@ -126,7 +127,7 @@ if(*pl)
 }
 return 0;
 }
-
+/////////////////////////////////////////////////////////////
 
 
 int insertarEnOrden(tLista *p,const tInfoL *d, int (* comparar)(const tInfoL *a, const tInfoL *b))

@@ -1,0 +1,158 @@
+///////////// Cuenta.h /////////////////////////////////////////////////////
+#ifndef CUENTA_H_INCLUDED
+#define CUENTA_H_INCLUDED
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+class Cuenta
+{
+
+    private:
+        char *nombre;
+        char *nroCuenta;
+        double tipoInteres;
+        double saldo;
+/** complete la declaración de la class **/
+
+    public:
+//Constructores
+    Cuenta(const char * = "", const char * = "" ,const  double = 0 , const double = 0);
+
+//Funciones
+  void mostrarSaldo() const; //    cuenta1.mostrarSaldo();
+  void ingreso(const int ); //cuenta1.ingreso(4000);
+  int transferencia(Cuenta &, const int );    //cuenta3.transferencia(cuenta2, 100)
+//friends
+ friend istream & operator>>(istream &, Cuenta &);   // cin >> cuenta1;
+ friend ostream & operator<<(ostream &, Cuenta &);
+
+//Destructor
+// ~Cuenta(); // destructor x q use memoria dinamica
+
+//static
+
+};
+
+#endif
+
+////////////////////////////////// Cuenta.c /////////////////////////////////////
+
+#include "Cuenta.h"
+
+
+/** desarrolle acá los métodos y funciones miembro de la class **/
+
+
+Cuenta::Cuenta(const char *nombre,const  char *nroCta,const  double tipoInt,const double saldo ){
+  if(!*nombre){
+    this->nombre = new char;
+    this->nombre = '\0';
+    }else{
+        this->nombre = new char[strlen(nombre)]; // reservo la cantidad de caracteres que tiene c
+        strcpy(this->nombre,nombre);  // como son string no sirve igualar tengo q hacer strcpy
+    }
+
+  if(!*nroCta){
+    this->nroCuenta = new char;
+    this->nroCuenta = '\0';
+    }else{
+        this->nroCuenta = new char[strlen(nroCta)]; // reservo la cantidad de caracteres que tiene c
+        strcpy(this->nroCuenta,nroCta);  // como son string no sirve igualar tengo q hacer strcpy
+    }
+    this->saldo = saldo;
+    this->tipoInteres = tipoInteres;
+
+}
+
+
+istream & operator>>(istream &in, Cuenta &obj){
+char lineaNombre[200] , lineaCta[200];
+double sald, inter;
+cout << "Ingrese el nombre:";
+in.getline(lineaNombre,sizeof(lineaNombre)); //reservo un tamanio para el ingreso
+delete[]obj.nombre; // por si obj esta sucio
+obj.nombre = new char(strlen(lineaNombre) +1);
+strcpy(obj.nombre, lineaNombre);
+
+cout << "Ingrese el nro de cuenta:";
+in.getline(lineaCta,sizeof(lineaCta)); //reservo un tamanio para el ingreso
+delete[]obj.nroCuenta; // por si obj esta sucio
+obj.nroCuenta = new char(strlen(lineaCta) +1);
+strcpy(obj.nroCuenta, lineaCta);
+
+cout << "Ingrese el interes:";
+in >> inter;
+cout << "Ingrese el saldo:";
+in >> sald;
+
+obj.saldo = sald;
+obj.tipoInteres = inter;
+return in;
+}
+
+ostream & operator<<(ostream &out, Cuenta &obj){
+out << obj.nombre <<endl;
+out << obj.nroCuenta <<endl;
+out << obj.tipoInteres<< endl;
+out << obj.saldo<< endl;
+
+
+return out;
+}
+
+//    cuenta1.mostrarSaldo();
+void Cuenta::mostrarSaldo()const {
+cout << saldo << endl;
+}
+
+
+void Cuenta::ingreso(int ing){
+    this->saldo += ing;
+}
+
+// cuenta3.transferencia(Cuenta2, 200); cuenta 3 le transfiere 200 a cuenta 2
+int Cuenta::transferencia(Cuenta &obj, int cant){
+if(this->saldo >= cant){
+    this->saldo -= cant;
+    obj.saldo += cant;
+    return 1;
+}
+return 0;
+}
+  //////////////////////////////////// Cuenta main /////////////////////////////////////////
+
+#include "main.h"
+
+
+int main()
+{
+    Cuenta cuenta1,
+           cuenta2( "Juan Fernandez Rubio", "12345678901234567890", 1.75, 300);
+
+    cin >> cuenta1;
+    Cuenta cuenta3(cuenta1);
+
+    cout << "\n >>>>>> Datos de la cuenta 1 <<<<<<<" <<endl;
+    cout << cuenta3;
+
+
+    cuenta1.ingreso(4000);
+    cuenta1.mostrarSaldo();
+
+    cout << "\n >>>>>> Datos de la cuenta 2 <<<<<<<" <<endl;
+    cout << cuenta2;
+    cout << "\n >>>>>> Datos de la cuenta 3 <<<<<<<" <<endl;
+    cout << cuenta3;
+
+    if ( cuenta3.transferencia(cuenta2, 100) == true)
+        cout << "Transferencia exitosa" <<endl;
+
+    cout << "\n >>>>>> Saldo de la cuenta 2 <<<<<<<" <<endl;
+    cuenta2.mostrarSaldo();
+    cout << "\n >>>>>> Saldo de la cuenta 3 <<<<<<<" <<endl;
+    cuenta3.mostrarSaldo();
+
+    return 0;
+}
