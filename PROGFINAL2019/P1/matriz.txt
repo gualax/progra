@@ -123,30 +123,6 @@ int i,j, aux;
     }
 }
 
-/*
-N = 3
-M = 3
-P = 2
-*/
-/// Reglas de multiplicacion de matrices 3x3 * 3x2
-///                                        |   |    deben ser iguales resultado matriz de 3x2
-///Ciclo es una variable que sirve para iterar las filas de A y las columnas de B al mismo tiempo
-void multiplicarMatriz(int a[][N], int b[][P],int  c[][P]){
-
-
-int fil, col, ciclo;
-
-printf("\n Multiplicar matriz\n");
-for(fil=0; fil <N; fil ++){
-    for(col =0 ; col < P; col ++){
-        for(ciclo=0, c[fil][col]; ciclo < N; ciclo ++){
-            c[fil][col] += a[fil][ciclo] * b[ciclo][col];
-        }
-    }
-}
-
-}
-
 
 /*
 1 0 0
@@ -1037,6 +1013,41 @@ void mostrarTriangulares(int mat[][TAM_MAT]){
 
 mostrarTriangularesArriba(mat);
 mostrarTriangularesAbajo(mat);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////// ROTAR MATRIZ 90° //////////////////////////////////////////////
+//Para rotar la matriz 90 grados primero tengo q cambiar las filas
+// y despues traasponer con respecto a la diagonal secundaria
+
+1)  CAMBIAR FILAS //////////////////////////////////////////////
+///cambia las filas de a primer fila por la ultima, la segunda por la penultima etc..  
+void cambiarEleFilas(int mat[][TAM_MAT]){
+
+int i,j,aux;
+
+for(i=0;i<(TAM_MAT/2);i++){           ///3
+  for(j=0;j<TAM_MAT;j++){  ///7
+      aux = mat[i][j];                        /// puse el 00 // 01             ////   10
+      mat[i][j]= mat[TAM_MAT - 1 - i][j];     ///  00 = 60   // 01 = 61        ////   10 = 50
+      mat[TAM_MAT - 1 - i][j] = aux;          /// 60 = 00    // 61 = 01        ////   50 = 10
+    }
+    }
+}
+
+2)  TRASPONER CON RESPECTO A LA DIAG SECUNDARIA //////////////////////////////////////////////
+void trasponerRespectoLaDiagSecundaria(int mat[][TAM_MAT]){
+int i,j,aux;
+
+for(i=0;i<TAM_MAT-1;i++){
+  for(j=0;j<TAM_MAT-1;j++){
+      aux = mat[i][j];
+      mat[i][j]= mat[TAM_MAT-j-1][TAM_MAT-i-1];     ///  00 = 66   // 01 = 56        ////   10 = 50
+      mat[TAM_MAT-j-1][TAM_MAT-i-1] = aux;          /// 66 = 00    // 56 = 01        ////   50 = 10
+     }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

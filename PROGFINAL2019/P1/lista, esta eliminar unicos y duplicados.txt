@@ -1,0 +1,246 @@
+#include"prototipos.h"
+void crearlista(t_lista* pl)
+{
+    *pl=NULL;
+}
+int insertaenlista(t_lista*pl,tdato *d)
+{
+    while(*pl)
+     pl=&(*pl)->sig;
+
+    t_nodo * nuevo;
+    nuevo=(t_nodo*)malloc(sizeof(t_nodo));
+
+    if(!nuevo)
+        return 0;
+
+    else
+    {
+        nuevo->info=*d;
+        nuevo->sig=*pl;
+        *pl=nuevo;
+        return 1;
+    }
+}
+void mostrarlista( t_lista *pl,t_accion accion)
+{
+    printf(" cod cantidad precio\n");
+    while(*pl)
+    {
+        accion(&(*pl)->info);
+
+        pl=&(*pl)->sig;
+    }
+}
+void mostrar(tdato *pl)
+{
+    printf("  %ld     %d      %.2f\n",pl->cod,pl->cant,pl->precio);
+}
+int eliminarduplicadosord(t_lista *pl)
+{
+    t_nodo *aux;
+    int dup;
+
+    while(*pl)
+    {
+            dup=0;
+            while((*pl)->sig &&comparar(&(*pl)->info,&(*pl)->sig->info)==0)
+            {
+            aux= (*pl)->sig;
+            consolidar(pl,&(*pl)->sig);
+            (*pl)->sig=aux->sig;
+            free(aux);
+            dup++;
+            }
+
+       pl=&(*pl)->sig;
+    }
+
+    return dup;
+}
+int comparar(tdato *pl1,tdato *pl2)
+{
+    return (pl1)->cod - (pl2)->cod;
+}
+int eliminarduplicadosnoord(t_lista *pl)
+{
+t_lista *q;
+t_nodo *aux;
+int cont=0;
+
+while(*pl)
+{
+    q=&(*pl)->sig;
+    while(*q)
+    {
+        if(comparar(&(*pl)->info,&(*q)->info)==0)
+        {
+            consolidar(pl,q);
+            aux=*q;
+            *q=aux->sig;
+            free(aux);
+            cont++;
+        }
+        else
+            q=&(*q)->sig;
+    }
+    pl=&(*pl)->sig;
+}
+
+return cont;
+}
+
+void consolidar(t_lista *p,t_lista*q)
+{
+    (*p)->info.cant+=(*q)->info.cant;
+    if((*p)->info.precio < (*q)->info.precio)
+        (*p)->info.precio = (*q)->info.precio;
+}
+
+int eliminarunicosord(t_lista*pl)
+{
+    int cont=0;
+    int duplicados;
+    t_lista *q;
+    t_nodo *aux;
+
+    while(*pl)
+    {
+        duplicados=0;
+        q=&(*pl)->sig;
+
+        while(*q&&comparar(&(*pl)->info,&(*q)->info)==0)
+        {
+            q=&(*q)->sig;
+            duplicados++;
+        }
+        if(duplicados)
+            pl=q;
+        else
+        {
+            aux=*pl;
+            *pl=aux->sig;
+            free(aux);
+            cont++;
+        }
+    }
+    return cont;
+}
+int eliminarunicosnoord(t_lista*pl)
+{
+    int iguales;
+    int cont=0;
+    t_nodo *q=*pl,*aux;
+
+        while(*pl)
+        {
+        iguales=0;
+        aux=q;
+
+            while(aux&& iguales<2)
+            {
+            if(comparar(&(*pl)->info,&aux->info)==0)
+            iguales++;
+            aux=aux->sig;
+            }
+        if(iguales==1)
+        {
+        aux=*pl;
+        *pl=aux->sig;
+        free(aux);
+        cont++;
+        }
+        else
+        pl=&(*pl)->sig;
+        }
+    return cont;
+}
+
+int eliminarunicosnoord2(t_lista *pl)
+{
+int iguales;
+int cont=0;
+t_nodo *q=*pl,*aux;
+
+
+    while(*pl)
+    {
+        iguales=0;
+        aux=q;
+        while(aux&&iguales<2)
+        {
+            if(comparar(&(*pl)->info,&aux->info)==0)
+            {
+                aux=aux->sig;
+                iguales++;
+            }
+        }
+            if(iguales==1)
+                    {
+                    aux=*pl;
+                    *pl=aux->sig;
+                    free(aux);
+                    cont++;
+
+                    }
+        else
+        pl=&(*pl)->sig;
+    }
+return cont;
+}
+
+int eliminarunicosord2(t_lista*pl)
+{
+    int duplicados;
+    int cont=0;
+
+    t_lista *q;
+    t_nodo *aux;
+
+    while(*pl)
+    {
+        duplicados=0;
+        q=&(*pl)->sig;
+
+        while(*q&&comparar(&(*pl)->info,&(*q)->info)==0)
+        {
+            q=&(*q)->sig;
+            duplicados++;
+        }
+        if(duplicados)
+            pl=q;
+        else
+        {
+            aux=*pl;
+            *pl=aux->sig;
+            free(aux);
+            cont++;
+        }
+        pl=&(*pl)->sig;
+    }
+    return cont;
+}
+
+int eliminar_de_lista_ord(t_lista*pl,tdato *d, t_cmp comp)
+{
+    t_nodo * elim;
+
+    while(*pl&& comp(d,&(*pl)->info)<0)
+        pl=&(*pl)->sig;
+
+    if(!*pl&& comp(d,&(*pl)->info)>0)
+    return 0;
+
+    else
+    {
+        elim=*pl;
+        *d=elim->info;
+        *pl=elim->sig;
+        free(elim);
+        return 1;
+    }
+}
+int lista_vacia(t_lista * pl)
+{
+    return *pl==NULL;
+}

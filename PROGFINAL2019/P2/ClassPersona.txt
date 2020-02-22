@@ -1,0 +1,153 @@
+////////////////////////// Persona.h ////////////////////////////////////////////////////
+
+class Persona
+{
+private:
+    char apellido[20];
+    char nombre[25];
+    char sexo;
+    int edad;
+
+public:
+
+    //constructor
+    Persona(const char* = "",const char* = "",  char = ' ', int = 0 );
+
+    //funciones
+    Persona  operator=(const Persona &);  /// modifico el objeto llamador, el objeto llamado no se modifica
+    Persona  operator++(int ); // post incremnto el int se pone para diferenciarlo del pre incremento, modifico el objeto
+
+    bool operator==(const Persona &)const; //ambos llevan const por q no seran modificados
+
+    //friend
+    friend ostream & operator<<(ostream &,Persona &);
+
+
+
+
+};
+
+
+////////////////////////// Persona.cpp ////////////////////////////////////////////////////
+#include <string.h>
+
+#include "persona.h"
+
+Persona::Persona(const char *ape, const char*nom,  char sex, int ed){
+if(!*nom){
+    strcpy(this->nombre,"");
+}else{
+    strcpy(this->nombre, nom);
+}
+
+if(!*ape){
+    strcpy(this->nombre,"");
+}else{
+    strcpy(this->apellido, ape);
+}
+
+this->sexo = sex;
+this->edad = ed;
+
+}
+
+
+ostream & operator<<(ostream &out,Persona &obj){
+out<< obj.nombre << " ";
+out<< obj.apellido << " ";
+out<< obj.sexo << " ";
+out<< obj.edad <<endl;
+return out;
+}
+
+
+Persona  Persona::operator=(const Persona &obj){
+strcpy(this->nombre,obj.nombre);
+strcpy(this->apellido,obj.apellido);
+this->sexo = obj.sexo;
+this->edad = obj.edad;
+}
+
+
+Persona  Persona::operator++(int num){
+this->edad += 1;
+}
+
+
+bool Persona::operator==(const Persona &obj)const{
+int cont = 0;
+if(strcmp(this->apellido,obj.apellido) != 0){
+    cont ++;
+}
+
+if(strcmp(this->nombre,  obj.nombre) != 0){
+    cont ++;
+}
+
+if(this->sexo != obj.sexo || this->edad != obj.edad){
+    cont ++;
+}
+
+if(cont != 0){
+    return false;
+}
+
+return true;
+}
+
+
+
+////////////////////////// Main.c ////////////////////////////////////////////////////
+#include "main.h"
+
+
+void probarPersonas(const char *ape1, const char *ape2,
+                    const char *nom1, const char *nom2,
+                    char sex1, char sex2, int edad1, int edad2)
+{
+
+   Persona  p1(ape1, nom1, sex1, edad1),
+            p2(ape2, nom2, sex2, edad2),
+            p3(p1),
+            p4;
+
+   cout << "Valores iniciales:" << endl
+        << "p1" << endl << p1 << endl << endl
+        << "p2" << endl << p2 << endl << endl
+        << "p3" << endl << p3 << endl << endl
+        << "p4" << endl << p4 << endl << endl;
+
+     p4 = p3;
+     cout << "p4" << endl << p4 << endl << endl;
+
+
+   p4++;  // modifica la edad
+   cout << "p4" << endl << p4 << endl << endl;
+
+
+   cout << "Valores finales:" << endl
+        << "p1" << endl << p1 << endl << endl
+        << "p2" << endl << p2 << endl << endl
+        << "p3" << endl << p3 << endl << endl
+        << "p4" << endl << p4 << endl << endl;
+
+   if(p1 == p3)
+      cout << p1 << "es idéntico a" << endl << p3 << endl << endl;
+
+}
+
+
+int main()
+{
+    cout << "Probando personas:" << endl;
+    probarPersonas("Martinez", "Perez",
+                   "Martina",  "Pedro",
+                   'F',        'M',
+                   22,         33);
+
+    return 0;
+
+}
+
+
+  
