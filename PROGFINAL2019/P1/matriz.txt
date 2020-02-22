@@ -1038,6 +1038,7 @@ for(i=0;i<(TAM_MAT/2);i++){           ///3
 }
 
 2)  TRASPONER CON RESPECTO A LA DIAG SECUNDARIA //////////////////////////////////////////////
+
 void trasponerRespectoLaDiagSecundaria(int mat[][TAM_MAT]){
 int i,j,aux;
 
@@ -1050,4 +1051,24 @@ for(i=0;i<TAM_MAT-1;i++){
     }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////// TRASPONER CON RESPECTO AL CENTRO////////////////////////////////////////////////////////////////////////
+/// funciona en una mat de 3x3 no se en las demas
+1 2 3		9 8 7		
+4 5 6  =>       6 5 4
+7 8 9		3 2 1 		
+
+void trasponerConRespectoAlCentro(int mat[][TAM]){
+int i,j,aux;
+
+for(i=0;i<TAM - 1;i++){
+  for(j=i;j<TAM;j++){
+      aux = mat[i][j];
+      mat[i][j]= mat[TAM-i-1][TAM-j-1];     ///  00 = 66   // 01 = 56        ////   10 = 50
+      mat[TAM-i-1][TAM-j-1] = aux;          /// 66 = 00    // 56 = 01        ////   50 = 10
+     }
+    }
+}
 /////////////////////////////////////////////////////////////////////////////////////////
