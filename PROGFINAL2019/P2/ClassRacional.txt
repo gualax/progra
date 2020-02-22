@@ -1,0 +1,174 @@
+/////////////////////////////// racional.h ///////////////////////////////////////
+
+#include <stdlib.h>
+#include <iostream>
+
+using namespace std;
+
+class Racional{
+
+private:
+int nume;
+int deno;
+
+public:
+
+// constructores
+Racional(int = 0, int = 1); //parametrizado
+
+//sobrecarga de operadores
+   Racional & operator=(const int );  //    r1 = 3;
+   Racional  operator+(const Racional &)const; //no pongo  el & por que tengo q devolver un nuevo objeto // r3 = r1 + r2;
+   Racional operator+(const int &)const;//    r4 = r2 + 2;
+   bool operator>(const Racional &)const; //if(r5>r3)
+   Racional  operator++(int); //r1++ post incremento
+   Racional & operator++();//++r1; pre incremento
+
+//funciones
+  int real()const;   // r1.real() //supongo q sera la parte real de la division
+
+//friends
+friend ostream & operator<<(ostream &,const Racional &);
+friend Racional operator+(const int &, const Racional &);//    r4 = 2 + r3; es friendo por q el + lo llama el 2
+friend istream & operator>>(istream &, Racional &);//	cin>>r5;
+
+
+};
+
+/////////////////////////////// racional.cpp ///////////////////////////////////////
+
+//Constructor
+Racional::Racional(int num, int deno){
+this->nume = num;
+this->deno = deno;
+}
+
+
+
+ostream & operator<<(ostream &out,const Racional &obj){
+out << "(" << obj.nume << "/";
+out << obj.deno << ")" << endl;
+ return out;
+}
+
+
+
+//r2 = r3
+Racional & Racional::operator=(const int num ){
+this->nume = num;
+this->deno = 1;
+return *this;
+}
+
+// r3 = r2 + r1
+Racional  Racional::operator+(const Racional &obj)const{
+Racional aux;
+aux.nume = (this->nume * obj.deno) + (this->deno * obj.nume);
+aux.deno = (this->deno * obj.deno);
+return aux;
+}
+
+// r4 = 2 + r2
+Racional operator+(const int & num, const Racional &obj){
+Racional aux;
+aux.nume = (num * obj.deno) + obj.nume;
+aux.deno = obj.deno;
+return aux;
+}
+
+//r2.real()
+int Racional::real()const{
+ int real;
+ real = this->nume / this->deno;
+ return real;
+}
+
+
+istream & operator>>(istream &in, Racional &obj){
+int num, den;
+cout << "Ingrese numerador"<<endl;
+in >> num;
+cout << "Ingrese denominador"<<endl;
+in >> den;
+obj.nume = num;
+obj.deno = den;
+ return in;
+}
+
+//if(r5>r3)
+bool Racional::operator>(const Racional &obj)const{
+int dif1, dif2;
+dif1 = abs(this->nume - this->deno);
+dif2 = abs(obj.nume - obj.deno);
+if(dif1 > dif2 ){
+    return true;
+}else{
+    return false;
+}
+}
+
+//r4 = r2 + 2;
+Racional Racional::operator+(const int &num)const
+{
+Racional aux;
+aux.nume = (this->nume * 1) + (this->deno * num);
+aux.deno = this->deno;
+return aux;
+}
+
+// r1++; post incremento
+Racional  Racional::operator++(int num){
+Racional aux(*this);
+this->nume++;
+this->deno++;
+return aux;
+}
+
+
+// ++r1; pre incremento
+Racional & Racional::operator++(){
+this->nume += 1;
+this->deno += 1;
+return *this;
+}
+/////////////////////////////////// main.cpp ///////////////////
+#include <iostream>
+#include "racional.h"
+
+
+using namespace std;
+
+int main()
+{
+    Racional r1, r2(2, 4), r3(5), r4, r5;
+
+	cout << "r1: "<< r1 << ", r2: " << r2 << ", r3: " << r3 << ", r4: " << r4 << endl;
+
+    r1 = 3;
+    cout << "r1:" <<r1 << endl;
+
+    r3 = r1 + r2;
+    cout << "r1:" <<r1 << "+" <<"r2:" <<r2 << endl;
+    cout << "r3:" <<r3 << endl;
+
+    r4 = 2 + r3;
+
+    r4 = r2 + 2;
+    cout << "r1: "<< r1 << endl;
+    cout << r1++;
+    cout << "r1++: "<< r1 << endl;
+    ++r1;
+	cout << "r1: "<< r1 << ", r2: " << r2 << ", r3: " << r3 << ", r4: " << r4 << endl;
+
+	cout << "r1: "<< r1.real() << ", r2: " << r2.real() << ", r3: " << r3.real() << ", r4: " << r4.real() << endl;
+
+	cout<<"\nIngese la fracción (numerador/denominador): ";
+	cin>>r5;
+
+	cout<<endl<<"r5: "<<r5<<endl;
+
+	if(r5>r3)
+        cout<< "r5 es mayor"<<endl;
+
+    return 0;
+}
