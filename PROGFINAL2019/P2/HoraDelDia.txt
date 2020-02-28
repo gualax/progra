@@ -1,0 +1,166 @@
+//////////////////////HoraDelDia.h////////////////////////////////////////////////////////////
+#include <iostream>
+#include <windows.h>
+
+using namespace std;
+
+
+
+class HoraDelDia{
+private:
+    int seg;
+
+public:
+
+// Constructor
+    HoraDelDia(const int = 0, const int = 0, const int = 0); //HoraDelDia inicio, fin(0,0,20); ///Horas, Minutos, Segundos
+//funciones
+bool operator>=(const HoraDelDia &)const; //if(inicio>=fin) //doble const por q no modifico ni al llamado ni al llamador
+bool operator<(const HoraDelDia &)const;  //inicio<fin
+HoraDelDia operator++(int); //inicio++ incrementa en +1 la hora post incremento
+HoraDelDia operator+(const HoraDelDia &)const;  //h1 + h2
+HoraDelDia & operator+=(int );   //h3+=2
+
+ //friend
+friend istream & operator >>(istream &, HoraDelDia &);
+friend ostream & operator <<(ostream &, const HoraDelDia &);
+friend HoraDelDia operator+(const int,const HoraDelDia & );//h3 = 3+h2
+
+//  static
+static HoraDelDia getHoraMaxima(); ////h3 = HoraDelDia::getHoraMaxima()
+
+};
+//////////////////////HoraDelDia.cpp////////////////////////////////////////////////////////////
+#include "horaDelDia.h"
+
+
+
+//constructor
+HoraDelDia::HoraDelDia(const int h, const int m,  const int s){
+    this->seg = (h*3600) + (m*60) + s;
+}
+
+
+
+istream & operator >>(istream &in, HoraDelDia &obj){
+int h, m, s;
+cout << "ingrese hora: " << endl;
+in >> h;
+cout << "ingrese minutos: " << endl;
+in >> m;
+cout << "ingrese Segundos: " << endl;
+in >> s;
+obj.seg = (h*3600) + (m*60) + s;
+
+return in;
+
+}
+
+
+ostream & operator <<(ostream &out, const HoraDelDia &obj){
+out<< obj.seg <<  endl;
+return out;
+}
+
+//if(incio>=fin)
+bool HoraDelDia::operator>=(const HoraDelDia &obj)const{
+if(this->seg >= obj.seg){
+    return true;
+}
+return false;
+}
+
+
+bool HoraDelDia::operator<(const HoraDelDia &obj)const{
+if(this->seg < obj.seg){
+    return true;
+}
+return false;
+
+}
+
+
+HoraDelDia HoraDelDia::operator++(int num){
+HoraDelDia aux(*this);  //  se hace esto por que si bien tengo q aumentar los seg,
+                        //lo q inmediatamente tengo q devolver es el valor antes del aumento osea aux asi funciona el post incremento
+this->seg ++;
+return aux;
+}
+
+
+HoraDelDia HoraDelDia::operator+(const HoraDelDia &obj)const{
+HoraDelDia aux;
+aux.seg  = this->seg + obj.seg;
+return aux;
+}
+
+
+HoraDelDia & HoraDelDia::operator+=(int num ){
+this->seg +=num;
+return *this;
+}
+
+HoraDelDia operator+(const int num ,const HoraDelDia &obj ){
+HoraDelDia aux;
+aux.seg = num + obj.seg;
+return aux;
+}
+
+///funcion statica h3= HoraDelDia::getHoraMaxima
+HoraDelDia HoraDelDia::getHoraMaxima(){
+return HoraDelDia(23,59,59);
+}
+
+
+//////////////////////main.cpp////////////////////////////////////////////////////////////
+#include "horaDelDia.h"
+
+int main()
+{
+
+    HoraDelDia inicio, fin(0,0,20); ///Horas, Minutos, Segundos
+
+    cout<<"Ingrese el horario de inicio: ";
+    cin>>inicio;
+
+    cout<<endl<<"Ingrese el horario de fin: ";
+    cin>>fin;
+    cout<<inicio<< endl;
+    cout<<fin<< endl;
+
+
+    if(inicio>=fin)
+    {
+        cout<<endl<<"Error! El horario de inicio debe ser menor al de fin.";
+        return 0;
+    }
+
+    while(inicio<fin)
+    {
+        system("CLS");
+        cout<<"Actual: "<<inicio++<<endl<<"Fin: "<<fin; ///++ incrementea en 1 segundo la hora
+        Sleep(1000);
+    }
+
+    cout<<"FIN"<<endl;
+    HoraDelDia h1(22,54,21), h2(1,20,55), h3; ///La hora nunca debe ser mayor a las 23:59:59
+
+    cout<<"H1: "<<h1<<endl;
+    cout<<"H2: "<<h2<<endl;
+
+    h3 = h1 + h2;
+    cout<<h3<< endl;
+
+    h3+=2; ///Segundos
+
+    cout<<h3<< endl;
+
+
+   h3 = 3+h2; ///Segundos
+    cout<<h3<< endl;
+
+
+    h3 = HoraDelDia::getHoraMaxima(); ///Devuelve una hora a las 23:59:59  // funcion estatica
+    cout<<"H3: "<<h3<< endl;
+    return 0;
+}
