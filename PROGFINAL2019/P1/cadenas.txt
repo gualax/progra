@@ -810,3 +810,129 @@ if( c >= '0' && c <= '9'){
 return 0;
 }
 //////////////////// FIN INVERTIR CADENA SEGUN NUMERO DE CARACTERES /////////////////////////////////////////////////////
+
+
+/////////////////////// ELIMINAR OCURRENCIA DE UNA CADENA DENTRO DE OTRA /////////////////////////////////////////////////////////////////////////
+
+char * eliminar_ocurrencias(char *str, char *substr)
+{
+    char *ori = str;
+    char *dest =str;
+    char *sub = substr;
+    int count = 0;
+
+
+while(*ori){
+
+    /// voy a ver si son iguales
+    while(*ori && *sub && *sub==*ori){ ///leo coincidencia de cadenas
+            count ++;
+            ori++;
+            sub++;
+    }
+
+  if(!*sub){ /// si lei toda la cadena quiere decir que es bien igual
+    while(count != 0){
+      ori--;
+      count --;
+      *ori = '|';  ///caracter  de referencia... 
+   }
+   while(*ori == '|'){  /// mientras encuentre este caracter no voy a copiar en la cadena
+    ori ++;
+   }
+   sub = substr;
+   ori++;
+  }else{   ///  si me quedaron cosas x  leer entonces  no era la cadena solo una parte cad por ejemplo
+    while(count != 0){
+        ori--;
+        count --;
+    }
+    *dest = *ori;
+    dest ++;
+    ori++;
+  }
+}
+
+ if(dest > str && *(dest -1)== ' ')
+    {
+        *dest --;
+    }
+
+        *dest = '\0';
+
+return str;
+
+}
+////////////////////////////FIN ELIMINAR OCURRENCIA DE UNA CADENA DENTRO DE OTRA////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////// REEMPLAZAR OCURRENCIAS ///////////////////////////////////////////////////////////////////////////
+/// Limitacion solo puedo reemplazar palabras de menor o igual tamaño,  no mas grandes..
+char * reemplazar_ocurrencias(char *str, char *substr, char*rempl)
+{
+    char *ori = str;
+    char *dest =str;
+    char *sub = substr;
+    char *remp = rempl;
+    int count = 0;
+
+while(*ori){
+
+    /// voy a ver si son iguales
+    while(*ori && *sub && *sub==*ori){ ///leo coincidencia de cadenas
+            count ++;
+            ori++;
+            sub++;
+    }
+
+  if(!*sub){ /// si lei toda la cadena quiere decir que es bien igual
+    while(count != 0){
+      ori--;
+      count --;
+      *ori = '|';  ///caracter  de referencia...
+   }
+
+/// aproaach para evitar quilombos
+    while(*ori == '|' && *remp){
+     *dest = *remp;
+     dest ++;
+     remp++;
+     ori++;
+    }
+
+   while(*ori == '|'){
+    ori++;
+   }
+
+  /// si queda por leer de la cad de reemplazo
+ /* para leer  masgrandes
+    while(*remp){
+       *dest = *remp;
+        dest ++;
+        remp ++;
+        ori++;
+    }
+ */
+   remp = rempl;
+   sub = substr;
+  }else{   ///  si me quedaron cosas x  leer entonces  no era la cadena solo una parte cad por ejemplo
+    while(count != 0){
+        ori--;
+        count --;
+    }
+    *dest = *ori;
+    dest ++;
+    ori++;
+  }
+}
+
+ if(dest > str && *(dest -1)== ' ')
+    {
+        *dest --;
+    }
+
+        *dest = '\0';
+
+return str;
+
+}
